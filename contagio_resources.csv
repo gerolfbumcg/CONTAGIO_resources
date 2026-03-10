@@ -1,6 +1,6 @@
 res_id,res_text,res_short_descr,res_long_descr,res_url,res_stage,res_wp
 R01,Consortium tool and Cohort inventory,Build consortium & cohort inventory,Tool to initiate a consortium by identifying international research groups with the required capacities to tackle an emerging outbreak.,https://contagio.shinyapps.io/StarterDashboard/,Stage 1 - Explore,WP1
-R02,EMBL Pathogens Portal,Discovery of existing data and samples,Portal for discovering existing pathogen data and biological samples across international repositories.,,Stage 1 - Explore,WP1
+R02,EMBL Pathogens Portal,Discovery of existing data and samples,Portal for discovering existing pathogen data and biological samples across international repositories.,https://www.pathogensportal.org/,Stage 1 - Explore,WP1
 R03,Standardized ethics/legal application protocols,Ethics & governance application protocols,Standardized protocols for ethics and legal applications to reduce delays in study set-up caused by lengthy legal drafting.,,Stage 2 - Study Set-Up,WP3
 R04,Broad Consent models for future use,Broad consent templates,Template consent models designed to cover future uses of collected data and samples under a broad consent framework.,,Stage 2 - Study Set-Up,WP3
 R05,Data Transfer/Processing Agreement (DTA/DPA) templates,DTA/DPA templates,Standardized templates for Data Transfer Agreements and Data Processing Agreements to facilitate legal data sharing between institutions.,,Stage 2 - Study Set-Up,WP3
