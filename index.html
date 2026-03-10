@@ -1,0 +1,615 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>CONTAGIO Tools – EID Cohort Life Cycle</title>
+        <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&family=Nunito+Sans:wght@300;400;600;700&display=swap');
+
+        :root {
+            --c1: #4a8fd4;
+            --c2: #3aada0;
+            --c3: #5bb8c4;
+            --c4: #6b9dbf;
+            --c5: #2d5f8a;
+            --bg: #dce9f4;
+            --text: #1a2a3a;
+            --muted: #5a7a9a;
+            --white: #ffffff;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Nunito Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            padding: 2rem 2rem 1rem;
+        }
+        header h1 {
+            font-family: 'Nunito', sans-serif;
+            font-size: clamp(1.3rem, 3vw, 2rem);
+            font-weight: 800;
+            color: var(--text);
+            letter-spacing: -0.01em;
+        }
+
+        #loading {
+            text-align: center;
+            padding: 4rem;
+            font-size: 1rem;
+            color: var(--muted);
+            font-style: italic;
+        }
+
+        #error-msg {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+            color: #c0392b;
+            background: #fdf0ee;
+            border: 1px solid #e8b4ae;
+            border-radius: 8px;
+            margin: 2rem;
+            font-size: 0.9rem;
+        }
+
+        /* ── Diagram container ── */
+        .diagram-wrap {
+            width: 100%;
+            overflow-x: auto;
+            padding: 0 1rem 2rem;
+        }
+
+        svg#diagram {
+            display: block;
+            margin: 0 auto;
+            font-family: 'Nunito Sans', sans-serif;
+        }
+
+        /* ── Resource cards (foreignObject) ── */
+        .res-card {
+            background: white;
+            border-radius: 8px;
+            padding: 7px 9px;
+            border-left: 3px solid #999;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.10);
+            font-size: 10px;
+            line-height: 1.4;
+            overflow: hidden;
+        }
+        .res-card .res-wp {
+            font-size: 8px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 3px;
+            opacity: 0.6;
+        }
+        .res-card .res-name {
+            font-weight: 700;
+            font-size: 10px;
+            line-height: 1.35;
+            margin-bottom: 2px;
+        }
+        .res-card .res-name a {
+            text-decoration: none;
+            border-bottom: 1px dashed currentColor;
+        }
+        .res-card .res-name a:hover {
+            border-bottom-style: solid;
+        }
+        .res-card .res-short {
+            font-size: 9px;
+            opacity: 0.65;
+            font-weight: 400;
+        }
+
+        /* ── Centre panel ── */
+        .center-box {
+            background: white;
+            border-radius: 10px;
+            border: 1.5px solid #b0c8e0;
+            padding: 1rem 1.5rem;
+            margin: 0 2rem 2rem;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .center-box h3 {
+            font-family: 'Nunito', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 800;
+            margin-bottom: 0.4rem;
+            color: #1a3a5c;
+        }
+        .center-box p {
+            font-size: 0.78rem;
+            color: var(--muted);
+            line-height: 1.65;
+        }
+
+        /* ── Resource table ── */
+        .table-section {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 1rem 2rem 3rem;
+        }
+        .table-section h2 {
+            font-family: 'Nunito', sans-serif;
+            font-size: 1rem;
+            font-weight: 800;
+            color: #1a3a5c;
+            margin-bottom: 0.8rem;
+            padding-bottom: 0.4rem;
+            border-bottom: 2px solid #b0c8e0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.78rem;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        }
+        th {
+            background: #1a3a5c;
+            color: white;
+            padding: 0.6rem 0.9rem;
+            text-align: left;
+            font-size: 0.68rem;
+            letter-spacing: 0.05em;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        td {
+            padding: 0.6rem 0.9rem;
+            border-bottom: 1px solid #eef0f4;
+            vertical-align: top;
+            line-height: 1.5;
+        }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #f5f9ff; }
+        td.mono { font-family: monospace; font-size: 0.68rem; color: var(--muted); }
+        td.url-cell { font-family: monospace; font-size: 0.68rem; word-break: break-all; }
+        td.url-cell a { color: #1a6fbf; }
+        td.url-cell .empty { color: #ccd0d8; font-style: italic; }
+        </style>
+    </head>
+<body>
+
+<header>
+  <h1>CONTAGIO Tools: Supporting the EID Cohort Life Cycle</h1>
+</header>
+
+<div id="loading">Loading resources…</div>
+<div id="error-msg"></div>
+
+<div class="diagram-wrap" style="display:none" id="diagram-wrap">
+  <svg id="diagram" xmlns="http://www.w3.org/2000/svg"></svg>
+</div>
+
+<div class="center-box" style="display:none" id="center-box">
+  <h3>🌐 Cohorts Network To be Activated Globally In Outbreaks</h3>
+  <p>A global consortium building the infrastructure to transition existing research cohorts into active outbreak response units. Work Packages (WPs) are functionally connected, providing continuous support rather than isolated silos.</p>
+</div>
+
+<div class="table-section" style="display:none" id="table-section">
+  <h2>Full resource table</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>res_id</th>
+        <th>res_text</th>
+        <th>res_short_descr</th>
+        <th>res_long_descr</th>
+        <th>res_url</th>
+        <th>res_stage</th>
+        <th>res_wp</th>
+      </tr>
+    </thead>
+    <tbody id="table-body"></tbody>
+  </table>
+</div>
+
+<script>
+// ── CONFIG ────────────────────────────────────────────────────────────────────
+const CSV_FILE = 'contagio_resources.csv';
+
+const STAGES = [
+  { id: 's1', label: 'EXPLORE',                  color: '#4a8fd4', darkColor: '#2d6aaa', title: 'Finding Expertise\nand Collaborators',          desc: 'Initiating a consortium by identifying international research groups with the required capacities to tackle an emerging outbreak.',    icon: 'explore'    },
+  { id: 's2', label: 'STUDY SET-UP',             color: '#3aada0', darkColor: '#267a70', title: 'Ethics, Legal Approvals,\nand Consent',             desc: 'Securing necessary ethical and legal frameworks without the delays typically caused by lengthy legal drafting.',                         icon: 'handshake'  },
+  { id: 's3', label: 'COLLECTING',               color: '#5bb8c4', darkColor: '#3a8f9a', title: 'Gathering High-Quality\nSamples and Data',          desc: 'Deploying standardized tools for multimodal data collection to ensure information is harmonized across different research sites.',       icon: 'chart'      },
+  { id: 's4', label: 'DIAGNOSTIC TESTING / ANALYSIS', color: '#6b9dbf', darkColor: '#456e8a', title: 'Addressing Measurement\nErrors and Standardization', desc: 'Utilizing advanced biostatistical tools to ensure diagnostic data is accurate, interpretable, and generalizable across different tests.', icon: 'diagnostic' },
+  { id: 's5', label: 'SHARING',                  color: '#2d5f8a', darkColor: '#1a3a5c', title: 'Distributing Data,\nSamples, and Expertise',       desc: 'Facilitating the flow of physical samples and digital data amongst research partners through transparent governance and access policies.', icon: 'share'      },
+];
+
+// ── CSV PARSER ────────────────────────────────────────────────────────────────
+function parseCSV(text) {
+  const lines = text.trim().split('\n');
+  const headers = lines[0].split(',').map(h => h.trim());
+  return lines.slice(1).map(line => {
+    // Handle quoted fields
+    const fields = [];
+    let cur = '', inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      if (line[i] === '"') { inQ = !inQ; }
+      else if (line[i] === ',' && !inQ) { fields.push(cur.trim()); cur = ''; }
+      else { cur += line[i]; }
+    }
+    fields.push(cur.trim());
+    const obj = {};
+    headers.forEach((h, i) => obj[h] = fields[i] || '');
+    return obj;
+  });
+}
+
+// ── SVG HELPERS ───────────────────────────────────────────────────────────────
+const SVG_NS = 'http://www.w3.org/2000/svg';
+const XHTML_NS = 'http://www.w3.org/1999/xhtml';
+
+function el(tag, attrs = {}, parent = null) {
+  const e = document.createElementNS(SVG_NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+
+function fo(x, y, w, h, parent) {
+  const f = document.createElementNS(SVG_NS, 'foreignObject');
+  f.setAttribute('x', x); f.setAttribute('y', y);
+  f.setAttribute('width', w); f.setAttribute('height', h);
+  if (parent) parent.appendChild(f);
+  return f;
+}
+
+// Arc path for curved text
+function arcPath(cx, cy, r, startDeg, endDeg) {
+  const s = startDeg * Math.PI / 180;
+  const e = endDeg   * Math.PI / 180;
+  const x1 = cx + r * Math.cos(s), y1 = cy + r * Math.sin(s);
+  const x2 = cx + r * Math.cos(e), y2 = cy + r * Math.sin(e);
+  const large = (endDeg - startDeg) > 180 ? 1 : 0;
+  return `M ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2}`;
+}
+
+// Wrap text into SVG tspan lines
+function wrapText(svgText, text, maxWidth, x, dy0, dyN, attrs = {}) {
+  const words = text.split(' ');
+  const lines = [];
+  let cur = '';
+  // Rough char-width estimate
+  const charW = (attrs['font-size'] || 13) * 0.55;
+  for (const w of words) {
+    const test = cur ? cur + ' ' + w : w;
+    if (test.length * charW > maxWidth && cur) { lines.push(cur); cur = w; }
+    else cur = test;
+  }
+  if (cur) lines.push(cur);
+  lines.forEach((line, i) => {
+    const ts = document.createElementNS(SVG_NS, 'tspan');
+    ts.setAttribute('x', x);
+    ts.setAttribute('dy', i === 0 ? dy0 : dyN);
+    for (const [k, v] of Object.entries(attrs)) ts.setAttribute(k, v);
+    ts.textContent = line;
+    svgText.appendChild(ts);
+  });
+  return lines.length;
+}
+
+// ── ICONS (inline SVG paths) ──────────────────────────────────────────────────
+function drawIcon(parent, type, cx, cy, size, color) {
+  const g = el('g', { transform: `translate(${cx - size/2},${cy - size/2})` }, parent);
+  const s = size;
+  const c = color;
+  if (type === 'explore') {
+    // Magnifying glass over people
+    el('circle', { cx: s*0.38, cy: s*0.38, r: s*0.22, stroke: c, 'stroke-width': 3, fill: 'none' }, g);
+    el('line',   { x1: s*0.55, y1: s*0.55, x2: s*0.72, y2: s*0.72, stroke: c, 'stroke-width': 3, 'stroke-linecap': 'round' }, g);
+    el('circle', { cx: s*0.35, cy: s*0.72, r: s*0.08, fill: c }, g);
+    el('circle', { cx: s*0.55, cy: s*0.72, r: s*0.08, fill: c }, g);
+    el('path',   { d: `M${s*0.2},${s*0.9} Q${s*0.35},${s*0.78} ${s*0.35},${s*0.82}`, stroke: c, 'stroke-width': 2, fill: 'none' }, g);
+    el('path',   { d: `M${s*0.7},${s*0.9} Q${s*0.55},${s*0.78} ${s*0.55},${s*0.82}`, stroke: c, 'stroke-width': 2, fill: 'none' }, g);
+  } else if (type === 'handshake') {
+    el('path', { d: `M${s*0.1},${s*0.55} L${s*0.35},${s*0.4} L${s*0.5},${s*0.45} L${s*0.65},${s*0.4} L${s*0.9},${s*0.55}`, stroke: c, 'stroke-width': 2.5, fill: 'none', 'stroke-linejoin': 'round' }, g);
+    el('path', { d: `M${s*0.35},${s*0.4} L${s*0.35},${s*0.25} L${s*0.5},${s*0.2} L${s*0.65},${s*0.25} L${s*0.65},${s*0.4}`, stroke: c, 'stroke-width': 2.5, fill: 'none' }, g);
+    el('line', { x1: s*0.3, y1: s*0.6, x2: s*0.5, y2: s*0.75, stroke: c, 'stroke-width': 2.5, 'stroke-linecap': 'round' }, g);
+    el('line', { x1: s*0.5, y1: s*0.75, x2: s*0.7, y2: s*0.6, stroke: c, 'stroke-width': 2.5, 'stroke-linecap': 'round' }, g);
+  } else if (type === 'chart') {
+    el('rect', { x: s*0.12, y: s*0.12, width: s*0.76, height: s*0.6, rx: 4, fill: 'none', stroke: c, 'stroke-width': 2 }, g);
+    el('polyline', { points: `${s*0.22},${s*0.58} ${s*0.38},${s*0.38} ${s*0.52},${s*0.48} ${s*0.66},${s*0.28} ${s*0.78},${s*0.35}`, fill: 'none', stroke: c, 'stroke-width': 2.5, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }, g);
+    el('line', { x1: s*0.3, y1: s*0.82, x2: s*0.7, y2: s*0.82, stroke: c, 'stroke-width': 2.5, 'stroke-linecap': 'round' }, g);
+    el('line', { x1: s*0.5, y1: s*0.72, x2: s*0.5, y2: s*0.82, stroke: c, 'stroke-width': 2.5 }, g);
+  } else if (type === 'diagnostic') {
+    el('polyline', { points: `${s*0.1},${s*0.5} ${s*0.28},${s*0.5} ${s*0.38},${s*0.25} ${s*0.5},${s*0.75} ${s*0.62},${s*0.35} ${s*0.72},${s*0.5} ${s*0.9},${s*0.5}`, fill: 'none', stroke: c, 'stroke-width': 2.5, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }, g);
+    el('circle', { cx: s*0.38, cy: s*0.82, r: s*0.07, fill: c }, g);
+    el('circle', { cx: s*0.5,  cy: s*0.82, r: s*0.07, fill: c }, g);
+    el('circle', { cx: s*0.62, cy: s*0.82, r: s*0.07, fill: c }, g);
+  } else if (type === 'share') {
+    el('circle', { cx: s*0.5, cy: s*0.25, r: s*0.12, fill: 'none', stroke: c, 'stroke-width': 2.5 }, g);
+    el('circle', { cx: s*0.2, cy: s*0.68, r: s*0.12, fill: 'none', stroke: c, 'stroke-width': 2.5 }, g);
+    el('circle', { cx: s*0.8, cy: s*0.68, r: s*0.12, fill: 'none', stroke: c, 'stroke-width': 2.5 }, g);
+    el('line', { x1: s*0.38, y1: s*0.32, x2: s*0.28, y2: s*0.58, stroke: c, 'stroke-width': 2 }, g);
+    el('line', { x1: s*0.62, y1: s*0.32, x2: s*0.72, y2: s*0.58, stroke: c, 'stroke-width': 2 }, g);
+    el('line', { x1: s*0.32, y1: s*0.68, x2: s*0.68, y2: s*0.68, stroke: c, 'stroke-width': 2 }, g);
+  }
+}
+
+// ── MAIN RENDER ───────────────────────────────────────────────────────────────
+function render(resources) {
+  const svg = document.getElementById('diagram');
+
+  // Layout constants
+  const R        = 115;   // circle radius
+  const OVERLAP  = 38;    // how much circles overlap
+  const STEP     = R * 2 - OVERLAP;
+  const N        = 5;
+  const PAD_X    = 80;
+  const CY       = 310;   // vertical center of circles
+  const CARD_W   = 155;
+  const CARD_H_S = 70;    // short card
+  const CARD_H_L = 88;    // tall card
+  const TOP_Y    = 30;    // top cards baseline
+  const BOT_Y    = CY + R + 30; // bottom cards baseline
+
+  const totalW = PAD_X * 2 + STEP * (N - 1) + R * 2;
+  const totalH = BOT_Y + 160;
+
+  svg.setAttribute('width',   totalW);
+  svg.setAttribute('height',  totalH);
+  svg.setAttribute('viewBox', `0 0 ${totalW} ${totalH}`);
+
+  // Stage centre X positions
+  const cx = STAGES.map((_, i) => PAD_X + R + i * STEP);
+
+  // ── defs: gradients + clip paths ──
+  const defs = el('defs', {}, svg);
+  STAGES.forEach((st, i) => {
+    const grad = el('radialGradient', { id: `grad${i}`, cx: '40%', cy: '35%', r: '65%' }, defs);
+    el('stop', { offset: '0%',   'stop-color': lighten(st.color, 30) }, grad);
+    el('stop', { offset: '100%', 'stop-color': st.color }, grad);
+
+    const clip = el('clipPath', { id: `clip${i}` }, defs);
+    el('circle', { cx: cx[i], cy: CY, r: R - 2 }, clip);
+  });
+
+  // Drop shadow filter
+  const filt = el('filter', { id: 'shadow', x: '-20%', y: '-20%', width: '140%', height: '140%' }, defs);
+  el('feDropShadow', { dx: 0, dy: 3, stdDeviation: 6, 'flood-color': 'rgba(0,0,0,0.18)' }, filt);
+
+  // ── Background ──
+  el('rect', { width: totalW, height: totalH, fill: '#dce9f4' }, svg);
+
+  // ── Connecting arrows between circles ──
+  for (let i = 0; i < N - 1; i++) {
+    const x1 = cx[i] + R - 6;
+    const x2 = cx[i + 1] - R + 6;
+    const mid = (x1 + x2) / 2;
+    el('path', {
+      d: `M${x1},${CY} C${x1+10},${CY} ${x2-10},${CY} ${x2},${CY}`,
+      stroke: '#a0b8cc', 'stroke-width': 2.5, fill: 'none',
+      'marker-end': 'url(#arrow)'
+    }, svg);
+  }
+
+  // Arrow marker
+  const marker = el('marker', { id: 'arrow', markerWidth: 8, markerHeight: 8, refX: 6, refY: 3, orient: 'auto' }, defs);
+  el('path', { d: 'M0,0 L0,6 L8,3 z', fill: '#a0b8cc' }, marker);
+
+  // ── Draw each stage circle ──
+  STAGES.forEach((st, i) => {
+    const x = cx[i];
+
+    // Outer ring (border)
+    el('circle', { cx: x, cy: CY, r: R, fill: st.darkColor, filter: 'url(#shadow)' }, svg);
+    // Inner fill
+    el('circle', { cx: x, cy: CY, r: R - 6, fill: `url(#grad${i})` }, svg);
+
+    // ── Curved stage label (arc text on top of circle) ──
+    const arcId = `arc${i}`;
+    const arcR  = R - 10;
+    el('path', { id: arcId, d: arcPath(x, CY, arcR, -165, -15), fill: 'none' }, defs);
+
+    const labelText = el('text', {
+      'font-family': 'Nunito, sans-serif',
+      'font-size': 9.5,
+      'font-weight': 800,
+      'letter-spacing': 1.2,
+      fill: 'white',
+      'text-anchor': 'middle',
+    }, svg);
+    const tp = el('textPath', { href: `#arc${i}`, startOffset: '50%' }, labelText);
+    tp.textContent = st.label;
+
+    // ── Icon ──
+    drawIcon(svg, st.icon, x, CY - 28, 52, 'rgba(255,255,255,0.92)');
+
+    // ── Title (bold, white, centred) ──
+    const titleLines = st.title.split('\n');
+    const titleY = CY + 32;
+    const tEl = el('text', {
+      x, y: titleY,
+      'font-family': 'Nunito, sans-serif',
+      'font-size': 13.5,
+      'font-weight': 800,
+      fill: 'white',
+      'text-anchor': 'middle',
+    }, svg);
+    titleLines.forEach((line, li) => {
+      const ts = el('tspan', { x, dy: li === 0 ? 0 : 16 }, tEl);
+      ts.textContent = line;
+    });
+
+    // ── Description (light, white, wrapped) ──
+    const descY = titleY + titleLines.length * 16 + 8;
+    const descEl = el('text', {
+      x, y: descY,
+      'font-family': 'Nunito Sans, sans-serif',
+      'font-size': 8.5,
+      'font-weight': 400,
+      fill: 'rgba(255,255,255,0.88)',
+      'text-anchor': 'middle',
+    }, svg);
+    wrapText(descEl, st.desc, (R - 18) * 2, x, 0, 11, { 'font-size': 8.5 });
+  });
+
+  // ── Resource cards ──
+  // Group resources by stage
+  const byStage = {};
+  STAGES.forEach(st => byStage[st.id] = []);
+  resources.forEach(r => {
+    const stageIdx = STAGES.findIndex(st => r.res_stage.toLowerCase().includes(st.label.split(' - ')[1].toLowerCase().split(' ')[0]));
+    if (stageIdx >= 0) byStage[STAGES[stageIdx].id].push(r);
+  });
+
+  // Card positions: alternate top/bottom, multiple cards per stage stack
+  STAGES.forEach((st, i) => {
+    const x   = cx[i];
+    const res = byStage[st.id];
+    if (!res.length) return;
+
+    // Split: first half above, second half below (or all above if 1)
+    const above = res.length === 1 ? res : res.slice(0, Math.ceil(res.length / 2));
+    const below = res.length === 1 ? []  : res.slice(Math.ceil(res.length / 2));
+
+    // Top cards (stack upward from circle top)
+    above.forEach((r, ci) => {
+      const cardH = 80;
+      const cardY = CY - R - 16 - (above.length - ci) * (cardH + 6);
+      drawCard(svg, r, x - CARD_W / 2, cardY, CARD_W, cardH, st.color, st.darkColor);
+      // Connector line
+      el('line', {
+        x1: x, y1: cardY + cardH,
+        x2: x, y2: CY - R,
+        stroke: st.color, 'stroke-width': 1.5,
+        'stroke-dasharray': '3,3', opacity: 0.6
+      }, svg);
+    });
+
+    // Bottom cards (stack downward from circle bottom)
+    below.forEach((r, ci) => {
+      const cardH = 80;
+      const cardY = CY + R + 16 + ci * (cardH + 6);
+      drawCard(svg, r, x - CARD_W / 2, cardY, CARD_W, cardH, st.color, st.darkColor);
+      el('line', {
+        x1: x, y1: CY + R,
+        x2: x, y2: cardY,
+        stroke: st.color, 'stroke-width': 1.5,
+        'stroke-dasharray': '3,3', opacity: 0.6
+      }, svg);
+    });
+  });
+
+  // Recalculate actual used height
+  svg.setAttribute('height', totalH);
+}
+
+function drawCard(svg, res, x, y, w, h, color, darkColor) {
+  const fo_el = fo(x, y, w, h, svg);
+  const div = document.createElementNS(XHTML_NS, 'div');
+  div.setAttribute('xmlns', XHTML_NS);
+  div.style.cssText = `
+    background:white;
+    border-radius:7px;
+    padding:6px 8px;
+    border-left:3px solid ${color};
+    box-shadow:0 1px 5px rgba(0,0,0,0.12);
+    font-size:10px;
+    line-height:1.4;
+    height:${h}px;
+    overflow:hidden;
+    font-family:'Nunito Sans',sans-serif;
+  `;
+
+  const wpDiv = document.createElementNS(XHTML_NS, 'div');
+  wpDiv.style.cssText = `font-size:7.5px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;opacity:0.55;margin-bottom:2px;color:${darkColor}`;
+  wpDiv.textContent = res.res_wp;
+
+  const nameDiv = document.createElementNS(XHTML_NS, 'div');
+  nameDiv.style.cssText = `font-weight:700;font-size:9.5px;line-height:1.35;margin-bottom:2px;color:#1a2a3a`;
+  if (res.res_url) {
+    const a = document.createElementNS(XHTML_NS, 'a');
+    a.setAttribute('href', res.res_url);
+    a.setAttribute('target', '_blank');
+    a.setAttribute('rel', 'noopener');
+    a.style.cssText = `color:${color};text-decoration:none;border-bottom:1px dashed ${color}`;
+    a.textContent = res.res_text;
+    nameDiv.appendChild(a);
+  } else {
+    nameDiv.textContent = res.res_text;
+  }
+
+  const shortDiv = document.createElementNS(XHTML_NS, 'div');
+  shortDiv.style.cssText = `font-size:8.5px;opacity:0.6;font-weight:400;color:#1a2a3a`;
+  shortDiv.textContent = res.res_short_descr;
+
+  div.appendChild(wpDiv);
+  div.appendChild(nameDiv);
+  div.appendChild(shortDiv);
+  fo_el.appendChild(div);
+}
+
+// ── TABLE ─────────────────────────────────────────────────────────────────────
+function renderTable(resources) {
+  const tbody = document.getElementById('table-body');
+  resources.forEach(r => {
+    const tr = document.createElement('tr');
+    const urlCell = r.res_url
+      ? `<a href="${r.res_url}" target="_blank" rel="noopener">${r.res_url}</a>`
+      : `<span class="empty">—</span>`;
+    tr.innerHTML = `
+      <td class="mono">${r.res_id}</td>
+      <td>${r.res_text}</td>
+      <td>${r.res_short_descr}</td>
+      <td style="color:#5a7a9a;font-size:0.72rem">${r.res_long_descr}</td>
+      <td class="url-cell">${urlCell}</td>
+      <td style="font-size:0.72rem">${r.res_stage}</td>
+      <td class="mono">${r.res_wp}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// ── COLOR UTILS ───────────────────────────────────────────────────────────────
+function lighten(hex, pct) {
+  const n = parseInt(hex.slice(1), 16);
+  const r = Math.min(255, (n >> 16) + pct);
+  const g = Math.min(255, ((n >> 8) & 0xff) + pct);
+  const b = Math.min(255, (n & 0xff) + pct);
+  return `rgb(${r},${g},${b})`;
+}
+
+// ── BOOT ──────────────────────────────────────────────────────────────────────
+fetch(CSV_FILE)
+  .then(r => {
+    if (!r.ok) throw new Error(`Could not load ${CSV_FILE} (HTTP ${r.status})`);
+    return r.text();
+  })
+  .then(text => {
+    const resources = parseCSV(text);
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('diagram-wrap').style.display = 'block';
+    document.getElementById('center-box').style.display = 'block';
+    document.getElementById('table-section').style.display = 'block';
+    render(resources);
+    renderTable(resources);
+  })
+  .catch(err => {
+    document.getElementById('loading').style.display = 'none';
+    const e = document.getElementById('error-msg');
+    e.style.display = 'block';
+    e.innerHTML = `<strong>Could not load resource data.</strong><br>${err.message}<br><br>
+      Make sure <code>contagio_resources.csv</code> is in the same folder as this HTML file,
+      and that you are serving the files via a web server (not opening directly from disk).`;
+  });
+</script>
+</body>
+</html>
