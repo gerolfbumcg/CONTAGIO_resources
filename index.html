@@ -246,13 +246,13 @@ function render(resources) {
   // Geometry
   const W = 1400, H = 1400;
   const CX = W/2, CY = H/2;
-  const ORBIT_R   = 310;   // centre → stage bubble centre
-  const BUBBLE_R  = 112;   // stage bubble radius
-  const CENTRE_R  = 152;   // central circle radius
-  const CARD_W    = 168;
-  const CARD_H    = 88;
-  const CARD_RING = 530;   // distance from canvas centre to card centre
-  const CARD_SPREAD = 150;  // tangential pixel spread between sibling cards
+  const ORBIT_R   = 270;   // centre → stage bubble centre
+  const BUBBLE_R  = 100;   // stage bubble radius
+  const CENTRE_R  = 110;   // central circle radius
+  const CARD_W    = 190;
+  const CARD_H    = 100;
+  const CARD_RING = 490;   // distance from canvas centre to card centre
+  const CARD_SPREAD = 200;  // tangential pixel spread between sibling cards
 
   // 5 stages equally spaced; top = -90°
   const angles = STAGES.map((_, i) => -90 + i * 72);
@@ -351,13 +351,13 @@ function render(resources) {
       el('rect', { x:cx0, y:cy0, width:4, height:CARD_H, rx:3, fill:st.color }, svg);
 
       // Resource name
-      const nameLines = wrapLines(r.res_text, 21).slice(0, 3);
+      const nameLines = wrapLines(r.res_text, 30).slice(0, 3);
       const nameBaseY = cy0 + 14;
       if (r.res_url) {
         const a = el('a', { href:r.res_url, target:'_blank' }, svg);
         nameLines.forEach((line, li) => {
           el('text', { x:cx0+11, y:nameBaseY + li*12,
-            'font-family':'Nunito,sans-serif', 'font-size':9.5,
+            'font-family':'Nunito,sans-serif', 'font-size':11,
             'font-weight':700, fill:st.color
           }, a).textContent = line;
         });
@@ -366,25 +366,25 @@ function render(resources) {
       } else {
         nameLines.forEach((line, li) => {
           el('text', { x:cx0+11, y:nameBaseY + li*12,
-            'font-family':'Nunito,sans-serif', 'font-size':9.5,
+            'font-family':'Nunito,sans-serif', 'font-size':11,
             'font-weight':700, fill:'#1a2a3a'
           }, svg).textContent = line;
         });
       }
 
       // WP label
-      el('text', { x:cx0+11, y:cy0+CARD_H-22,
-        'font-family':'Nunito Sans,sans-serif', 'font-size':7.5,
-        'font-weight':700, 'letter-spacing':0.8, fill:st.dark, opacity:0.65
+      el('text', { x:cx0+11, y:cy0+CARD_H-35,
+        'font-family':'Nunito Sans,sans-serif', 'font-size': 11,
+        'font-weight':700, 'letter-spacing':0.8, fill:st.dark, opacity:0.95
       }, svg).textContent = r.res_wp;
 
-      // Short description
-      const shortTrunc = r.res_short_descr.length > 27
-        ? r.res_short_descr.slice(0,26)+'…' : r.res_short_descr;
-      el('text', { x:cx0+11, y:cy0+CARD_H-10,
-        'font-family':'Nunito Sans,sans-serif', 'font-size':7.8,
-        fill:'#5a7a9a'
-      }, svg).textContent = shortTrunc;
+      const shortTrunc = wrapLines(r.res_short_descr, 35);
+      shortTrunc.slice(0,2).forEach((line, li) => {
+        el('text', { x:cx0+11, y:cy0+CARD_H-20+li*13,
+          'font-family':'Nunito Sans,sans-serif', 'font-size':11,
+          fill:'rgba(0, 0, 0, 0.81)', 'text-anchor':'left', 'font-weight':300
+        }, svg).textContent = line;
+      });
     });
   });
 
@@ -407,10 +407,10 @@ function render(resources) {
     stroke:'rgba(255,255,255,0.28)', 'stroke-width':1 }, svg);
 
   const bodyLines = wrapLines(
-    'A global consortium building the infrastructure to transition existing research cohorts into active outbreak response units. Work Packages are functionally connected.', 25);
-  bodyLines.slice(0,6).forEach((line, li) => {
+    'A global consortium building the infrastructure to transition existing research cohorts into active outbreak response units. Work Packages are functionally connected.', 40);
+  bodyLines.slice(0,7).forEach((line, li) => {
     el('text', { x:CX, y:CY+14+li*13,
-      'font-family':'Nunito Sans,sans-serif', 'font-size':8.5,
+      'font-family':'Nunito Sans,sans-serif', 'font-size':11,
       fill:'rgba(255,255,255,0.68)', 'text-anchor':'middle', 'font-weight':300
     }, svg).textContent = line;
   });
@@ -431,7 +431,7 @@ function render(resources) {
     }, svg).textContent = st.label;
 
     // Icon
-    drawIcon(svg, st.icon, bx, by-42, 48, 'rgba(255,255,255,0.93)');
+    drawIcon(svg, st.icon, bx, by-32, 48, 'rgba(255,255,255,0.93)');
 
     // Title
     const titleLines = st.title.split('\n');
@@ -443,10 +443,10 @@ function render(resources) {
     });
 
     // Description
-    const descY = by + 14 + titleLines.length*15 + 7;
+    const descY = by + 12 + titleLines.length*15 + 7;
     wrapLines(st.desc, 18).slice(0,4).forEach((line, li) => {
       el('text', { x:bx, y:descY + li*11,
-        'font-family':'Nunito Sans,sans-serif', 'font-size':7.6,
+        'font-family':'Nunito Sans,sans-serif', 'font-size':10,
         fill:'rgba(255,255,255,0.80)', 'text-anchor':'middle', 'font-weight':300
       }, svg).textContent = line;
     });
