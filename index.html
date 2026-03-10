@@ -1,13 +1,14 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CONTAGIO Resources – EID Cohort Life Cycle</title>
+<title>CONTAGIO Tools – EID Cohort Life Cycle</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&family=Nunito+Sans:wght@300;400;600;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800;900&family=Nunito+Sans:ital,wght@0,300;0,400;0,600;0,700;1,300&display=swap');
 
-  :root { --bg: #dce9f4; --text: #1a2a3a; --muted: #5a7a9a; }
+  :root { --bg: #d8e8f2; --text: #1a2a3a; --muted: #5a7a9a; }
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
@@ -19,19 +20,20 @@
 
   header {
     text-align: center;
-    padding: 2rem 2rem 0.5rem;
+    padding: 2.2rem 2rem 0.5rem;
   }
   header h1 {
     font-family: 'Nunito', sans-serif;
     font-size: clamp(1.2rem, 2.8vw, 1.9rem);
-    font-weight: 800;
-    color: var(--text);
+    font-weight: 900;
+    color: #1a2e42;
     letter-spacing: -0.01em;
   }
 
   #loading {
     text-align: center;
-    padding: 4rem;
+    padding: 5rem;
+    font-size: 1rem;
     color: var(--muted);
     font-style: italic;
   }
@@ -44,28 +46,29 @@
     background: #fdf0ee;
     border: 1px solid #e8b4ae;
     border-radius: 8px;
-    margin: 2rem;
-    font-size: 0.9rem;
+    margin: 2rem auto;
+    max-width: 600px;
+    font-size: 0.88rem;
+    line-height: 1.6;
   }
 
   .diagram-wrap {
     display: none;
     width: 100%;
     overflow: auto;
-    padding: 1rem;
+    padding: 0 1rem 1rem;
   }
 
   svg#diagram {
     display: block;
     margin: 0 auto;
-    overflow: visible;
   }
 
   .table-section {
     display: none;
     max-width: 1100px;
     margin: 0 auto;
-    padding: 1rem 2rem 3rem;
+    padding: 0.5rem 2rem 3rem;
   }
   .table-section h2 {
     font-family: 'Nunito', sans-serif;
@@ -74,7 +77,7 @@
     color: #1a3a5c;
     margin-bottom: 0.8rem;
     padding-bottom: 0.4rem;
-    border-bottom: 2px solid #b0c8e0;
+    border-bottom: 2px solid #aac4da;
   }
   table {
     width: 100%;
@@ -83,30 +86,30 @@
     background: white;
     border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    box-shadow: 0 1px 6px rgba(0,0,0,0.07);
   }
   th {
     background: #1a3a5c;
     color: white;
     padding: 0.6rem 0.9rem;
     text-align: left;
-    font-size: 0.68rem;
-    letter-spacing: 0.05em;
+    font-size: 0.66rem;
+    letter-spacing: 0.06em;
     font-weight: 700;
     text-transform: uppercase;
   }
   td {
     padding: 0.6rem 0.9rem;
-    border-bottom: 1px solid #eef0f4;
+    border-bottom: 1px solid #eef0f5;
     vertical-align: top;
     line-height: 1.5;
   }
   tr:last-child td { border-bottom: none; }
-  tr:hover td { background: #f5f9ff; }
+  tr:hover td { background: #f4f8fd; }
   td.mono { font-family: monospace; font-size: 0.68rem; color: var(--muted); }
-  td.url-cell { font-family: monospace; font-size: 0.68rem; word-break: break-all; }
+  td.url-cell { font-family: monospace; font-size: 0.67rem; word-break: break-all; }
   td.url-cell a { color: #1a6fbf; }
-  .empty { color: #ccd0d8; font-style: italic; }
+  td.url-cell .empty { color: #ccd0d8; font-style: italic; }
 </style>
 </head>
 <body>
@@ -125,374 +128,327 @@
 <div class="table-section" id="table-section">
   <h2>Full resource table</h2>
   <table>
-    <thead>
-      <tr>
-        <th>res_id</th><th>res_text</th><th>res_short_descr</th>
-        <th>res_long_descr</th><th>res_url</th><th>res_stage</th><th>res_wp</th>
-      </tr>
-    </thead>
+    <thead><tr>
+      <th>res_id</th><th>res_text</th><th>res_short_descr</th>
+      <th>res_long_descr</th><th>res_url</th><th>res_stage</th><th>res_wp</th>
+    </tr></thead>
     <tbody id="table-body"></tbody>
   </table>
 </div>
 
 <script>
 const CSV_FILE = 'contagio_resources.csv';
-const SVG_NS   = 'http://www.w3.org/2000/svg';
-const XHTML_NS = 'http://www.w3.org/1999/xhtml';
 
-// Stages in clockwise order starting from top (12 o'clock = Explore)
 const STAGES = [
-  {
-    id: 'explore',    label: 'EXPLORE',
-    color: '#4a8fd4', dark: '#2d6aaa',
-    title: 'Finding Expertise\nand Collaborators',
-    desc: 'Initiating a consortium by identifying international research groups with the required capacities to tackle an emerging outbreak.',
-    icon: 'explore',  stageKey: 'explore',
-  },
-  {
-    id: 'setup',      label: 'STUDY SET-UP',
-    color: '#3aada0', dark: '#267a70',
-    title: 'Ethics, Legal Approvals,\nand Consent',
-    desc: 'Securing necessary ethical and legal frameworks without the delays typically caused by lengthy legal drafting.',
-    icon: 'handshake', stageKey: 'study set',
-  },
-  {
-    id: 'collecting', label: 'COLLECTING',
-    color: '#5bb8c4', dark: '#3a8f9a',
-    title: 'Gathering High-Quality\nSamples and Data',
-    desc: 'Deploying standardized tools for multimodal data collection to ensure information is harmonized across different research sites.',
-    icon: 'chart',    stageKey: 'collect',
-  },
-  {
-    id: 'diagnostic', label: 'DIAGNOSTIC TESTING',
-    color: '#6b9dbf', dark: '#456e8a',
-    title: 'Addressing Measurement\nErrors and Standardization',
-    desc: 'Utilizing advanced biostatistical tools to ensure diagnostic data is accurate, interpretable, and generalizable across different tests.',
-    icon: 'diagnostic', stageKey: 'diagnostic',
-  },
-  {
-    id: 'sharing',    label: 'SHARING',
-    color: '#2d5f8a', dark: '#1a3a5c',
-    title: 'Distributing Data,\nSamples, and Expertise',
-    desc: 'Facilitating the flow of physical samples and digital data amongst research partners through transparent governance and access policies.',
-    icon: 'share',    stageKey: 'shar',
-  },
+  { key:'explore',    label:'EXPLORE',           stageMatch:'explore',    color:'#4a8fd4', dark:'#2d6090', title:'Finding Expertise\nand Collaborators',          desc:'Initiating a consortium by identifying international research groups with the required capacities to tackle an emerging outbreak.',    icon:'explore'    },
+  { key:'setup',      label:'STUDY SET-UP',       stageMatch:'set-up',     color:'#3aada0', dark:'#237a70', title:'Ethics, Legal Approvals,\nand Consent',             desc:'Securing necessary ethical and legal frameworks without the delays typically caused by lengthy legal drafting.',                         icon:'handshake'  },
+  { key:'collecting', label:'COLLECTING',         stageMatch:'collect',    color:'#5bb8c4', dark:'#358a96', title:'Gathering High-Quality\nSamples and Data',          desc:'Deploying standardized tools for multimodal data collection to ensure information is harmonized across different research sites.',       icon:'chart'      },
+  { key:'diagnostic', label:'DIAGNOSTIC TESTING', stageMatch:'diagnostic', color:'#5a8fb8', dark:'#3a6080', title:'Addressing Measurement\nErrors & Standardization',  desc:'Utilizing advanced biostatistical tools to ensure diagnostic data is accurate, interpretable, and generalizable across different tests.', icon:'diagnostic' },
+  { key:'sharing',    label:'SHARING',            stageMatch:'shar',       color:'#2d5f8a', dark:'#1a3a5c', title:'Distributing Data,\nSamples, and Expertise',        desc:'Facilitating the flow of physical samples and digital data amongst research partners through transparent governance and access policies.', icon:'share'      },
 ];
 
-// ── CSV ───────────────────────────────────────────────────────────────────────
+// ── CSV parser ────────────────────────────────────────────────────────────────
 function parseCSV(text) {
-  const lines = text.trim().split(/\r?\n/);
+  const lines = text.trim().split('\n');
   const headers = lines[0].split(',').map(h => h.trim());
-  return lines.slice(1).map(line => {
+  return lines.slice(1).filter(l => l.trim()).map(line => {
     const fields = [];
     let cur = '', inQ = false;
     for (const ch of line) {
-      if (ch === '"') inQ = !inQ;
+      if (ch === '"') { inQ = !inQ; }
       else if (ch === ',' && !inQ) { fields.push(cur.trim()); cur = ''; }
       else cur += ch;
     }
     fields.push(cur.trim());
     const obj = {};
-    headers.forEach((h, i) => obj[h] = fields[i] || '');
+    headers.forEach((h, i) => obj[h] = (fields[i] || '').replace(/^"|"$/g, ''));
     return obj;
   });
 }
 
 // ── SVG helpers ───────────────────────────────────────────────────────────────
-function el(tag, attrs = {}, parent = null) {
-  const e = document.createElementNS(SVG_NS, tag);
-  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+const NS = 'http://www.w3.org/2000/svg';
+function el(tag, attrs, parent) {
+  const e = document.createElementNS(NS, tag);
+  if (attrs) for (const [k,v] of Object.entries(attrs)) e.setAttribute(k, String(v));
   if (parent) parent.appendChild(e);
   return e;
 }
-
-function xel(tag, styles = {}, parent = null) {
-  const e = document.createElementNS(XHTML_NS, tag);
-  e.style.cssText = Object.entries(styles).map(([k,v]) => `${k}:${v}`).join(';');
-  if (parent) parent.appendChild(e);
-  return e;
+function polar(cx, cy, r, deg) {
+  const a = deg * Math.PI / 180;
+  return [cx + r * Math.cos(a), cy + r * Math.sin(a)];
 }
-
 function arcPath(cx, cy, r, a0, a1) {
-  const r0 = a0 * Math.PI / 180, r1 = a1 * Math.PI / 180;
-  return `M ${cx + r*Math.cos(r0)} ${cy + r*Math.sin(r0)} A ${r} ${r} 0 ${a1-a0 > 180 ? 1 : 0} 1 ${cx + r*Math.cos(r1)} ${cy + r*Math.sin(r1)}`;
+  const [x0,y0] = polar(cx, cy, r, a0);
+  const [x1,y1] = polar(cx, cy, r, a1);
+  const large = ((a1 - a0 + 360) % 360) > 180 ? 1 : 0;
+  return `M${x0},${y0} A${r},${r} 0 ${large} 1 ${x1},${y1}`;
+}
+function lighten(hex, amt) {
+  const n = parseInt(hex.replace('#',''), 16);
+  return `rgb(${Math.min(255,(n>>16)+amt)},${Math.min(255,((n>>8)&0xff)+amt)},${Math.min(255,(n&0xff)+amt)})`;
 }
 
-function lighten(hex, n) {
-  const v = parseInt(hex.slice(1), 16);
-  return `rgb(${Math.min(255,(v>>16)+n)},${Math.min(255,((v>>8)&255)+n)},${Math.min(255,(v&255)+n)})`;
-}
-
-// ── Icons ─────────────────────────────────────────────────────────────────────
-function drawIcon(parent, type, cx, cy, size, color) {
-  const g = el('g', { transform: `translate(${cx-size/2},${cy-size/2})` }, parent);
-  const s = size, c = color;
+// ── Icon drawing ──────────────────────────────────────────────────────────────
+function drawIcon(parent, type, cx, cy, sz, col) {
+  const g = el('g', { transform:`translate(${cx-sz/2},${cy-sz/2})` }, parent);
+  const s = sz, sw = s*0.11;
+  const base = { stroke:col, 'stroke-width':sw, fill:'none', 'stroke-linecap':'round', 'stroke-linejoin':'round' };
   if (type === 'explore') {
-    el('circle', { cx:s*.38, cy:s*.38, r:s*.22, stroke:c, 'stroke-width':2.5, fill:'none' }, g);
-    el('line',   { x1:s*.55, y1:s*.55, x2:s*.72, y2:s*.72, stroke:c, 'stroke-width':2.5, 'stroke-linecap':'round' }, g);
-    el('circle', { cx:s*.33, cy:s*.73, r:s*.08, fill:c }, g);
-    el('circle', { cx:s*.53, cy:s*.73, r:s*.08, fill:c }, g);
-    el('path',   { d:`M${s*.17},${s*.9} Q${s*.33},${s*.8} ${s*.33},${s*.83}`, stroke:c, 'stroke-width':1.8, fill:'none' }, g);
-    el('path',   { d:`M${s*.69},${s*.9} Q${s*.53},${s*.8} ${s*.53},${s*.83}`, stroke:c, 'stroke-width':1.8, fill:'none' }, g);
+    el('circle', { ...base, cx:s*.42, cy:s*.42, r:s*.26 }, g);
+    el('line',   { ...base, x1:s*.62, y1:s*.62, x2:s*.82, y2:s*.82 }, g);
+    el('circle', { cx:s*.28, cy:s*.76, r:s*.09, fill:col }, g);
+    el('circle', { cx:s*.52, cy:s*.76, r:s*.09, fill:col }, g);
+    el('path', { ...base, d:`M${s*.14},${s*.92} C${s*.14},${s*.76} ${s*.28},${s*.78} ${s*.28},${s*.86}` }, g);
+    el('path', { ...base, d:`M${s*.66},${s*.92} C${s*.66},${s*.76} ${s*.52},${s*.78} ${s*.52},${s*.86}` }, g);
   } else if (type === 'handshake') {
-    el('path', { d:`M${s*.08},${s*.55} L${s*.32},${s*.38} L${s*.5},${s*.44} L${s*.68},${s*.38} L${s*.92},${s*.55}`, stroke:c, 'stroke-width':2.5, fill:'none', 'stroke-linejoin':'round' }, g);
-    el('path', { d:`M${s*.32},${s*.38} L${s*.32},${s*.22} L${s*.5},${s*.16} L${s*.68},${s*.22} L${s*.68},${s*.38}`, stroke:c, 'stroke-width':2.5, fill:'none', 'stroke-linejoin':'round' }, g);
-    el('line', { x1:s*.28, y1:s*.62, x2:s*.5,  y2:s*.78, stroke:c, 'stroke-width':2.5, 'stroke-linecap':'round' }, g);
-    el('line', { x1:s*.5,  y1:s*.78, x2:s*.72, y2:s*.62, stroke:c, 'stroke-width':2.5, 'stroke-linecap':'round' }, g);
+    el('path', { ...base, d:`M${s*.08},${s*.6} L${s*.3},${s*.44} L${s*.5},${s*.5} L${s*.7},${s*.44} L${s*.92},${s*.6}` }, g);
+    el('path', { ...base, d:`M${s*.3},${s*.44} L${s*.3},${s*.26} L${s*.5},${s*.18} L${s*.7},${s*.26} L${s*.7},${s*.44}` }, g);
+    el('path', { ...base, d:`M${s*.26},${s*.66} L${s*.5},${s*.82} L${s*.74},${s*.66}` }, g);
   } else if (type === 'chart') {
-    el('rect',     { x:s*.1, y:s*.1, width:s*.8, height:s*.62, rx:4, fill:'none', stroke:c, 'stroke-width':2 }, g);
-    el('polyline', { points:`${s*.2},${s*.58} ${s*.36},${s*.36} ${s*.52},${s*.48} ${s*.67},${s*.26} ${s*.8},${s*.34}`, fill:'none', stroke:c, 'stroke-width':2.5, 'stroke-linejoin':'round', 'stroke-linecap':'round' }, g);
-    el('line', { x1:s*.28, y1:s*.84, x2:s*.72, y2:s*.84, stroke:c, 'stroke-width':2.5, 'stroke-linecap':'round' }, g);
-    el('line', { x1:s*.5,  y1:s*.72, x2:s*.5,  y2:s*.84, stroke:c, 'stroke-width':2 }, g);
+    el('rect', { ...base, x:s*.1, y:s*.1, width:s*.8, height:s*.62, rx:s*.06 }, g);
+    el('polyline', { ...base, points:`${s*.22},${s*.58} ${s*.38},${s*.34} ${s*.52},${s*.46} ${s*.66},${s*.24} ${s*.78},${s*.32}` }, g);
+    el('line', { ...base, x1:s*.28, y1:s*.86, x2:s*.72, y2:s*.86 }, g);
+    el('line', { ...base, x1:s*.5,  y1:s*.72, x2:s*.5,  y2:s*.86 }, g);
   } else if (type === 'diagnostic') {
-    el('polyline', { points:`${s*.08},${s*.5} ${s*.26},${s*.5} ${s*.38},${s*.24} ${s*.5},${s*.76} ${s*.62},${s*.34} ${s*.74},${s*.5} ${s*.92},${s*.5}`, fill:'none', stroke:c, 'stroke-width':2.5, 'stroke-linejoin':'round', 'stroke-linecap':'round' }, g);
-    el('circle', { cx:s*.35, cy:s*.84, r:s*.06, fill:c }, g);
-    el('circle', { cx:s*.5,  cy:s*.84, r:s*.06, fill:c }, g);
-    el('circle', { cx:s*.65, cy:s*.84, r:s*.06, fill:c }, g);
+    el('polyline', { ...base, points:`${s*.06},${s*.5} ${s*.24},${s*.5} ${s*.36},${s*.22} ${s*.5},${s*.78} ${s*.64},${s*.3} ${s*.76},${s*.5} ${s*.94},${s*.5}` }, g);
+    el('circle', { cx:s*.32, cy:s*.84, r:s*.07, fill:col }, g);
+    el('circle', { cx:s*.5,  cy:s*.84, r:s*.07, fill:col }, g);
+    el('circle', { cx:s*.68, cy:s*.84, r:s*.07, fill:col }, g);
   } else if (type === 'share') {
-    el('circle', { cx:s*.5,  cy:s*.22, r:s*.11, fill:'none', stroke:c, 'stroke-width':2.5 }, g);
-    el('circle', { cx:s*.18, cy:s*.72, r:s*.11, fill:'none', stroke:c, 'stroke-width':2.5 }, g);
-    el('circle', { cx:s*.82, cy:s*.72, r:s*.11, fill:'none', stroke:c, 'stroke-width':2.5 }, g);
-    el('line', { x1:s*.39, y1:s*.31, x2:s*.26, y2:s*.61, stroke:c, 'stroke-width':2 }, g);
-    el('line', { x1:s*.61, y1:s*.31, x2:s*.74, y2:s*.61, stroke:c, 'stroke-width':2 }, g);
-    el('line', { x1:s*.29, y1:s*.72, x2:s*.71, y2:s*.72, stroke:c, 'stroke-width':2 }, g);
+    el('circle', { ...base, cx:s*.5,  cy:s*.22, r:s*.13 }, g);
+    el('circle', { ...base, cx:s*.18, cy:s*.72, r:s*.13 }, g);
+    el('circle', { ...base, cx:s*.82, cy:s*.72, r:s*.13 }, g);
+    el('line', { ...base, x1:s*.38, y1:s*.3,  x2:s*.26, y2:s*.6  }, g);
+    el('line', { ...base, x1:s*.62, y1:s*.3,  x2:s*.74, y2:s*.6  }, g);
+    el('line', { ...base, x1:s*.32, y1:s*.72, x2:s*.68, y2:s*.72 }, g);
   }
 }
 
-// ── Resource card via foreignObject ───────────────────────────────────────────
-function drawCard(parent, res, x, y, w, color, dark) {
-  const fo = el('foreignObject', { x, y, width: w, height: 200 }, parent);
-  const wrap = document.createElementNS(XHTML_NS, 'div');
-  wrap.setAttribute('xmlns', XHTML_NS);
-  wrap.style.cssText = `font-family:'Nunito Sans',sans-serif;width:${w}px`;
-
-  const card = xel('div', {
-    background: 'white',
-    'border-radius': '7px',
-    padding: '6px 8px',
-    'border-left': `3px solid ${color}`,
-    'box-shadow': '0 1px 6px rgba(0,0,0,0.13)',
-    'font-size': '10px',
-    'line-height': '1.4',
-  }, wrap);
-
-  const wpEl = xel('div', {
-    'font-size': '7px', 'font-weight': '700',
-    'letter-spacing': '.08em', 'text-transform': 'uppercase',
-    color: dark, opacity: '.7', 'margin-bottom': '2px',
-  }, card);
-  wpEl.textContent = res.res_wp;
-
-  const nameEl = xel('div', {
-    'font-size': '9.5px', 'font-weight': '700',
-    'line-height': '1.35', color: '#1a2a3a', 'margin-bottom': '2px',
-  }, card);
-  if (res.res_url) {
-    const a = document.createElementNS(XHTML_NS, 'a');
-    a.setAttribute('href', res.res_url);
-    a.setAttribute('target', '_blank');
-    a.setAttribute('rel', 'noopener');
-    a.style.cssText = `color:${color};text-decoration:none;border-bottom:1px dashed ${color}`;
-    a.textContent = res.res_text;
-    nameEl.appendChild(a);
-  } else {
-    nameEl.textContent = res.res_text;
+// ── Text wrap helper ──────────────────────────────────────────────────────────
+function wrapLines(text, maxChars) {
+  const words = text.split(' ');
+  const lines = [];
+  let cur = '';
+  for (const w of words) {
+    const test = cur ? cur+' '+w : w;
+    if (test.length > maxChars && cur) { lines.push(cur); cur = w; }
+    else cur = test;
   }
-
-  const shortEl = xel('div', { 'font-size': '8px', color: '#5a7a9a', 'line-height': '1.3' }, card);
-  shortEl.textContent = res.res_short_descr;
-
-  fo.appendChild(wrap);
-  return fo;
+  if (cur) lines.push(cur);
+  return lines;
 }
 
 // ── RENDER ────────────────────────────────────────────────────────────────────
 function render(resources) {
   const svg = document.getElementById('diagram');
 
-  // Layout constants
-  const CX = 500, CY = 500;
-  const ORBIT_R  = 210;   // orbit radius (centre → bubble centre)
-  const BR       = 108;   // bubble radius
-  const CARD_W   = 155;
-  const CARD_GAP = 12;
+  // Geometry
+  const W = 1400, H = 1400;
+  const CX = W/2, CY = H/2;
+  const ORBIT_R   = 310;   // centre → stage bubble centre
+  const BUBBLE_R  = 112;   // stage bubble radius
+  const CENTRE_R  = 152;   // central circle radius
+  const CARD_W    = 168;
+  const CARD_H    = 88;
+  const CARD_RING = 530;   // distance from canvas centre to card centre
+  const CARD_SPREAD = 150;  // tangential pixel spread between sibling cards
 
-  // Distribute stages evenly, Explore at top
-  STAGES.forEach((st, i) => {
-    const deg = -90 + i * (360 / STAGES.length);
-    st.deg = deg;
-    st.rad = deg * Math.PI / 180;
-    st.bx  = CX + ORBIT_R * Math.cos(st.rad);
-    st.by  = CY + ORBIT_R * Math.sin(st.rad);
-    st.resources = [];
-  });
+  // 5 stages equally spaced; top = -90°
+  const angles = STAGES.map((_, i) => -90 + i * 72);
 
-  // Assign resources to stages
-  resources.forEach(r => {
-    const key = r.res_stage.toLowerCase();
-    const st = STAGES.find(s => key.includes(s.stageKey));
-    if (st) st.resources.push(r);
-  });
+  svg.setAttribute('width',   W);
+  svg.setAttribute('height',  H);
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
 
-  // Canvas: enough room for cards radiating outward (max ~3 cards deep at 155px each)
-  const SIZE = 1000;
-  svg.setAttribute('width',   SIZE);
-  svg.setAttribute('height',  SIZE);
-  svg.setAttribute('viewBox', `0 0 ${SIZE} ${SIZE}`);
-
-  // ── defs ──
+  // ── Defs ──
   const defs = el('defs', {}, svg);
 
+  // Shadows
+  const fSh = el('filter', { id:'sh',   x:'-30%', y:'-30%', width:'160%', height:'160%' }, defs);
+  el('feDropShadow', { dx:0, dy:4, stdDeviation:8,  'flood-color':'rgba(0,0,0,0.22)' }, fSh);
+  const fSm = el('filter', { id:'shSm', x:'-25%', y:'-25%', width:'150%', height:'150%' }, defs);
+  el('feDropShadow', { dx:0, dy:2, stdDeviation:4,  'flood-color':'rgba(0,0,0,0.13)' }, fSm);
+
+  // Stage radial gradients
   STAGES.forEach((st, i) => {
-    const g = el('radialGradient', { id:`grad${i}`, cx:'38%', cy:'32%', r:'68%' }, defs);
+    const g = el('radialGradient', { id:`sg${i}`, cx:'38%', cy:'32%', r:'68%' }, defs);
     el('stop', { offset:'0%',   'stop-color': lighten(st.color, 38) }, g);
-    el('stop', { offset:'100%', 'stop-color': st.color }, g);
+    el('stop', { offset:'100%', 'stop-color': st.color              }, g);
   });
 
-  const filt = el('filter', { id:'shadow', x:'-25%', y:'-25%', width:'150%', height:'150%' }, defs);
-  el('feDropShadow', { dx:0, dy:3, stdDeviation:7, 'flood-color':'rgba(0,0,0,0.18)' }, filt);
-
-  const cg = el('radialGradient', { id:'centreGlow', cx:'50%', cy:'50%', r:'50%' }, defs);
-  el('stop', { offset:'0%',   'stop-color':'#edf5fb' }, cg);
-  el('stop', { offset:'100%', 'stop-color':'#c4daf0' }, cg);
+  // Centre gradient
+  const cg = el('radialGradient', { id:'cg', cx:'40%', cy:'35%', r:'65%' }, defs);
+  el('stop', { offset:'0%',   'stop-color':'#3a7ab0' }, cg);
+  el('stop', { offset:'100%', 'stop-color':'#1a3a5c' }, cg);
 
   // Arrow marker
-  const mk = el('marker', { id:'arr', markerWidth:7, markerHeight:7, refX:5, refY:3, orient:'auto' }, defs);
-  el('path', { d:'M0,0 L0,6 L7,3 z', fill:'#94b4cc' }, mk);
+  const mk = el('marker', { id:'arr', markerWidth:7, markerHeight:7, refX:5, refY:3.5, orient:'auto' }, defs);
+  el('path', { d:'M0,0.5 L0,6.5 L7,3.5 z', fill:'#8aaec8' }, mk);
 
   // ── Background ──
-  el('rect', { width:SIZE, height:SIZE, fill:'#dce9f4' }, svg);
+  el('rect', { width:W, height:H, fill:'#d8e8f2' }, svg);
 
-  // ── Faint orbit guide ring ──
-  el('circle', { cx:CX, cy:CY, r:ORBIT_R, fill:'none', stroke:'#a8c4d8', 'stroke-width':1.5, 'stroke-dasharray':'5,5', opacity:.45 }, svg);
+  // Subtle orbit ring
+  el('circle', { cx:CX, cy:CY, r:ORBIT_R, fill:'none',
+    stroke:'rgba(255,255,255,0.30)', 'stroke-width':1.5, 'stroke-dasharray':'6,5' }, svg);
 
-  // ── Spokes ──
-  STAGES.forEach(st => {
-    el('line', {
-      x1: CX + (ORBIT_R - BR - 5) * Math.cos(st.rad),
-      y1: CY + (ORBIT_R - BR - 5) * Math.sin(st.rad),
-      x2: CX + (ORBIT_R + BR + 5) * Math.cos(st.rad),
-      y2: CY + (ORBIT_R + BR + 5) * Math.sin(st.rad),
-      stroke: st.color, 'stroke-width':1.5, opacity:.25
-    }, svg);
+  // ── Group resources by stage ──
+  const byStage = {};
+  STAGES.forEach(st => byStage[st.key] = []);
+  resources.forEach(r => {
+    const match = STAGES.find(st => r.res_stage.toLowerCase().includes(st.stageMatch));
+    if (match) byStage[match.key].push(r);
   });
 
-  // ── Centre circle ──
-  const centreR = ORBIT_R - BR - 18;
-  el('circle', { cx:CX, cy:CY, r:centreR, fill:'url(#centreGlow)', stroke:'#94b4cc', 'stroke-width':1.8 }, svg);
+  // ── Spokes (centre → bubble) ──
+  STAGES.forEach((st, i) => {
+    const ang = angles[i];
+    const [sx0, sy0] = polar(CX, CY, CENTRE_R + 8,        ang);
+    const [sx1, sy1] = polar(CX, CY, ORBIT_R - BUBBLE_R - 8, ang);
+    el('line', { x1:sx0, y1:sy0, x2:sx1, y2:sy1,
+      stroke:'#8aaec8', 'stroke-width':2, 'marker-end':'url(#arr)', opacity:0.8 }, svg);
+  });
+
+  // ── Cards: placed on outer ring, spread tangentially ──
+  // For each stage, cards are distributed around the stage's spoke angle.
+  // The tangent direction is perpendicular to the radial spoke.
+  STAGES.forEach((st, i) => {
+    const ang = angles[i];
+    const rad = ang * Math.PI / 180;
+    const [bx, by] = polar(CX, CY, ORBIT_R, ang);
+
+    const res = byStage[st.key];
+    if (!res.length) return;
+
+    // Tangent unit vector (perpendicular to radial, rotated 90°)
+    const tx = -Math.sin(rad);
+    const ty =  Math.cos(rad);
+
+    // Centre offset for this group so cards are evenly spread around spoke
+    const totalSpan = (res.length - 1) * CARD_SPREAD;
+
+    res.forEach((r, ci) => {
+      // Tangential offset: spread cards symmetrically around the spoke
+      const tOffset = -totalSpan / 2 + ci * CARD_SPREAD;
+
+      // Card centre position: outward along spoke + tangential offset
+      const [rcx, rcy] = polar(CX, CY, CARD_RING, ang);
+      const cardCX = rcx + tx * tOffset;
+      const cardCY = rcy + ty * tOffset;
+      const cx0 = cardCX - CARD_W / 2;
+      const cy0 = cardCY - CARD_H / 2;
+
+      // Connector: from bubble edge to card edge nearest the bubble
+      const [lx0, ly0] = polar(CX, CY, ORBIT_R + BUBBLE_R + 6, ang);
+      el('line', { x1:lx0, y1:ly0, x2:cardCX, y2:cardCY,
+        stroke:st.color, 'stroke-width':1.5, 'stroke-dasharray':'4,3', opacity:0.65 }, svg);
+
+      // Card shadow + body
+      el('rect', { x:cx0, y:cy0, width:CARD_W, height:CARD_H, rx:7,
+        fill:'white', filter:'url(#shSm)' }, svg);
+      // Colour accent bar
+      el('rect', { x:cx0, y:cy0, width:4, height:CARD_H, rx:3, fill:st.color }, svg);
+
+      // Resource name
+      const nameLines = wrapLines(r.res_text, 21).slice(0, 3);
+      const nameBaseY = cy0 + 14;
+      if (r.res_url) {
+        const a = el('a', { href:r.res_url, target:'_blank' }, svg);
+        nameLines.forEach((line, li) => {
+          el('text', { x:cx0+11, y:nameBaseY + li*12,
+            'font-family':'Nunito,sans-serif', 'font-size':9.5,
+            'font-weight':700, fill:st.color
+          }, a).textContent = line;
+        });
+        el('line', { x1:cx0+11, y1:cy0+16, x2:cx0+CARD_W-8, y2:cy0+16,
+          stroke:st.color, 'stroke-width':0.7, 'stroke-dasharray':'2,2', opacity:0.55 }, svg);
+      } else {
+        nameLines.forEach((line, li) => {
+          el('text', { x:cx0+11, y:nameBaseY + li*12,
+            'font-family':'Nunito,sans-serif', 'font-size':9.5,
+            'font-weight':700, fill:'#1a2a3a'
+          }, svg).textContent = line;
+        });
+      }
+
+      // WP label
+      el('text', { x:cx0+11, y:cy0+CARD_H-22,
+        'font-family':'Nunito Sans,sans-serif', 'font-size':7.5,
+        'font-weight':700, 'letter-spacing':0.8, fill:st.dark, opacity:0.65
+      }, svg).textContent = r.res_wp;
+
+      // Short description
+      const shortTrunc = r.res_short_descr.length > 27
+        ? r.res_short_descr.slice(0,26)+'…' : r.res_short_descr;
+      el('text', { x:cx0+11, y:cy0+CARD_H-10,
+        'font-family':'Nunito Sans,sans-serif', 'font-size':7.8,
+        fill:'#5a7a9a'
+      }, svg).textContent = shortTrunc;
+    });
+  });
+
+  // ── Central circle ──
+  el('circle', { cx:CX, cy:CY, r:CENTRE_R+8, fill:'#1a3a5c', filter:'url(#sh)' }, svg);
+  el('circle', { cx:CX, cy:CY, r:CENTRE_R,   fill:'url(#cg)' }, svg);
 
   // Centre text
-  const cLines = [
-    { t:'Cohorts Network',         s:15, w:800, f:'Nunito',      c:'#1a3a5c' },
-    { t:'To be Activated',         s:12, w:600, f:'Nunito Sans', c:'#1a3a5c' },
-    { t:'Globally In Outbreaks',   s:12, w:600, f:'Nunito Sans', c:'#1a3a5c' },
-    { t:'',                        s:7,  w:400, f:'Nunito Sans', c:'#5a7a9a' },
-    { t:'A global consortium',     s:9,  w:400, f:'Nunito Sans', c:'#5a7a9a' },
-    { t:'building infrastructure', s:9,  w:400, f:'Nunito Sans', c:'#5a7a9a' },
-    { t:'to activate outbreak',    s:9,  w:400, f:'Nunito Sans', c:'#5a7a9a' },
-    { t:'response units.',         s:9,  w:400, f:'Nunito Sans', c:'#5a7a9a' },
-  ];
-  let cty = CY - 44;
-  cLines.forEach(line => {
-    el('text', {
-      x:CX, y:cty,
-      'font-family':`'${line.f}',sans-serif`,
-      'font-size': line.s, 'font-weight': line.w,
-      fill: line.c, 'text-anchor':'middle',
-    }, svg).textContent = line.t;
-    cty += line.s + 4;
+  el('text', { x:CX, y:CY-44, 'font-family':'Nunito,sans-serif',
+    'font-size':14.5, 'font-weight':900, fill:'white',
+    'text-anchor':'middle', 'letter-spacing':0.4 }, svg).textContent = 'Cohorts Network';
+  el('text', { x:CX, y:CY-26, 'font-family':'Nunito,sans-serif',
+    'font-size':11, 'font-weight':600, fill:'rgba(255,255,255,0.78)',
+    'text-anchor':'middle' }, svg).textContent = 'To be Activated Globally';
+  el('text', { x:CX, y:CY-11, 'font-family':'Nunito,sans-serif',
+    'font-size':11, 'font-weight':600, fill:'rgba(255,255,255,0.78)',
+    'text-anchor':'middle' }, svg).textContent = 'In Outbreaks';
+
+  el('line', { x1:CX-68, y1:CY-3, x2:CX+68, y2:CY-3,
+    stroke:'rgba(255,255,255,0.28)', 'stroke-width':1 }, svg);
+
+  const bodyLines = wrapLines(
+    'A global consortium building the infrastructure to transition existing research cohorts into active outbreak response units. Work Packages are functionally connected.', 25);
+  bodyLines.slice(0,6).forEach((line, li) => {
+    el('text', { x:CX, y:CY+14+li*13,
+      'font-family':'Nunito Sans,sans-serif', 'font-size':8.5,
+      fill:'rgba(255,255,255,0.68)', 'text-anchor':'middle', 'font-weight':300
+    }, svg).textContent = line;
   });
 
-  // ── Stage bubbles ──
+  // ── Stage bubbles (on top) ──
   STAGES.forEach((st, i) => {
-    const { bx, by, color, dark, deg, rad } = st;
+    const ang = angles[i];
+    const [bx, by] = polar(CX, CY, ORBIT_R, ang);
 
-    // Outer ring + gradient fill
-    el('circle', { cx:bx, cy:by, r:BR,     fill:dark,        filter:'url(#shadow)' }, svg);
-    el('circle', { cx:bx, cy:by, r:BR - 5, fill:`url(#grad${i})` }, svg);
+    // Border ring + fill
+    el('circle', { cx:bx, cy:by, r:BUBBLE_R+7, fill:st.dark, filter:'url(#sh)' }, svg);
+    el('circle', { cx:bx, cy:by, r:BUBBLE_R,   fill:`url(#sg${i})` }, svg);
 
-    // ── Curved label on the arc facing outward ──
-    // Arc spans ±55° around the outward direction
-    // For bubbles in the bottom half we reverse so text isn't upside-down
-    const span = 58;
-    const inBottom = by > CY + 5;
-    const a0 = inBottom ? deg + span : deg - span;
-    const a1 = inBottom ? deg - span : deg + span;
-    const arcId = `arc${i}`;
-    el('path', { id:arcId, d:arcPath(bx, by, BR - 11, a0, a1), fill:'none' }, defs);
+    // Straight horizontal label above icon
+    el('text', { x:bx, y:by-68,
+      'font-family':'Nunito,sans-serif', 'font-size':9, 'font-weight':900,
+      'letter-spacing':1.5, fill:'white', 'text-anchor':'middle', opacity:0.92
+    }, svg).textContent = st.label;
 
-    const lt = el('text', {
-      'font-family':"'Nunito',sans-serif",
-      'font-size':9, 'font-weight':800, 'letter-spacing':1.4,
-      fill:'white', 'text-anchor':'middle',
-    }, svg);
-    el('textPath', { href:`#${arcId}`, startOffset:'50%' }, lt).textContent = st.label;
+    // Icon
+    drawIcon(svg, st.icon, bx, by-42, 48, 'rgba(255,255,255,0.93)');
 
-    // ── Icon ──
-    drawIcon(svg, st.icon, bx, by - 20, 46, 'rgba(255,255,255,0.93)');
-
-    // ── Title ──
-    const tLines = st.title.split('\n');
-    const tEl = el('text', {
-      x:bx, y: by + 16,
-      'font-family':"'Nunito',sans-serif",
-      'font-size':12.5, 'font-weight':800,
-      fill:'white', 'text-anchor':'middle',
-    }, svg);
-    tLines.forEach((l, li) => el('tspan', { x:bx, dy: li===0 ? 0 : 15 }, tEl).textContent = l);
-
-    // ── Description ──
-    const descY = by + 16 + tLines.length * 15 + 5;
-    const dEl = el('text', {
-      x:bx, y: descY,
-      'font-family':"'Nunito Sans',sans-serif",
-      'font-size':7.5, fill:'rgba(255,255,255,0.82)',
-      'text-anchor':'middle',
-    }, svg);
-    const maxCh = Math.floor((BR * 1.55) / 4.2);
-    let dLine = '', dLines = [];
-    st.desc.split(' ').forEach(w => {
-      const t = dLine ? dLine + ' ' + w : w;
-      if (t.length > maxCh && dLine) { dLines.push(dLine); dLine = w; } else dLine = t;
+    // Title
+    const titleLines = st.title.split('\n');
+    titleLines.forEach((line, li) => {
+      el('text', { x:bx, y:by + 14 + li*15,
+        'font-family':'Nunito,sans-serif', 'font-size':11.5,
+        'font-weight':800, fill:'white', 'text-anchor':'middle'
+      }, svg).textContent = line;
     });
-    if (dLine) dLines.push(dLine);
-    dLines.slice(0, 4).forEach((l, li) => el('tspan', { x:bx, dy: li===0 ? 0 : 10 }, dEl).textContent = l);
 
-    // ── Resource cards radiating outward ──
-    if (!st.resources.length) return;
-
-    const ux = Math.cos(rad), uy = Math.sin(rad); // outward unit vector
-
-    // Start cards just beyond the bubble edge
-    let distFromCentre = ORBIT_R + BR + CARD_GAP;
-
-    st.resources.forEach((res) => {
-      // Card top-left corner: card is CARD_W wide, centred perpendicularly on the ray
-      const midX = CX + distFromCentre * ux + CARD_W / 2 * ux;
-      const midY = CY + distFromCentre * uy + CARD_W / 2 * uy;
-
-      // Rotate the card so it aligns with the ray direction
-      // We place the foreignObject axis-aligned but translate+rotate the group
-      const cardGroup = el('g', {
-        transform: `rotate(${deg + 90}, ${CX + distFromCentre * ux}, ${CY + distFromCentre * uy})`
-      }, svg);
-
-      // Dashed connector from bubble edge to card
-      el('line', {
-        x1: CX + (ORBIT_R + BR) * ux,
-        y1: CY + (ORBIT_R + BR) * uy,
-        x2: CX + distFromCentre * ux,
-        y2: CY + distFromCentre * uy,
-        stroke: color, 'stroke-width':1.5,
-        'stroke-dasharray':'3,3', opacity:.55
-      }, svg);
-
-      // Draw card in un-rotated group at the right position
-      const cardX = CX + distFromCentre * ux - CARD_W / 2;
-      const cardY = CY + distFromCentre * uy;
-      drawCard(svg, res, cardX, cardY, CARD_W, color, dark);
-
-      distFromCentre += CARD_W + 10;
+    // Description
+    const descY = by + 14 + titleLines.length*15 + 7;
+    wrapLines(st.desc, 18).slice(0,4).forEach((line, li) => {
+      el('text', { x:bx, y:descY + li*11,
+        'font-family':'Nunito Sans,sans-serif', 'font-size':7.6,
+        fill:'rgba(255,255,255,0.80)', 'text-anchor':'middle', 'font-weight':300
+      }, svg).textContent = line;
     });
   });
 }
@@ -509,11 +465,10 @@ function renderTable(resources) {
       <td class="mono">${r.res_id}</td>
       <td>${r.res_text}</td>
       <td>${r.res_short_descr}</td>
-      <td style="color:#5a7a9a;font-size:.72rem">${r.res_long_descr}</td>
+      <td style="color:#5a7a9a;font-size:0.72rem">${r.res_long_descr}</td>
       <td class="url-cell">${urlCell}</td>
-      <td style="font-size:.72rem">${r.res_stage}</td>
-      <td class="mono">${r.res_wp}</td>
-    `;
+      <td style="font-size:0.72rem">${r.res_stage}</td>
+      <td class="mono">${r.res_wp}</td>`;
     tbody.appendChild(tr);
   });
 }
@@ -538,7 +493,7 @@ fetch(CSV_FILE)
     e.style.display = 'block';
     e.innerHTML = `<strong>Could not load resource data.</strong><br>${err.message}<br><br>
       Make sure <code>contagio_resources.csv</code> is in the same folder as this HTML file
-      and that you are serving via a web server (not opening directly with <code>file://</code>).`;
+      and that you are serving via a web server (not <code>file://</code>).`;
   });
 </script>
 </body>
