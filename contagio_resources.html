@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CONTAGIO Tools – EID Cohort Life Cycle</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@300;400;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
+  :root {
+    --stage1: #4a90d9;
+    --stage2: #3aada0;
+    --stage3: #5bb8c4;
+    --stage4: #6b9dbf;
+    --stage5: #2d5f8a;
+    --bg: #eef3f8;
+    --panel: #ffffff;
+    --text: #1a2a3a;
+    --muted: #5a7a9a;
+    --accent: #e8a020;
+    --link: #1a6fbf;
+    --link-hover: #0d4a8a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Source Serif 4', Georgia, serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  header {
+    background: linear-gradient(135deg, #1a3a5c 0%, #2d6a9f 100%);
+    color: white;
+    padding: 2rem 3rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      45deg, transparent, transparent 20px,
+      rgba(255,255,255,0.02) 20px, rgba(255,255,255,0.02) 40px
+    );
+  }
+  header h1 {
+    font-size: 1.9rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    position: relative;
+  }
+  header p {
+    margin-top: 0.4rem;
+    font-size: 0.95rem;
+    opacity: 0.75;
+    font-weight: 300;
+    position: relative;
+  }
+
+  .lifecycle {
+    display: flex;
+    gap: 0;
+    padding: 2rem;
+    overflow-x: auto;
+    align-items: stretch;
+  }
+
+  .stage {
+    flex: 1;
+    min-width: 200px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  .stage-connector {
+    position: absolute;
+    right: -12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .stage-connector svg { width: 24px; height: 24px; }
+
+  .stage-header {
+    padding: 0.8rem 1rem;
+    border-radius: 8px 8px 0 0;
+    color: white;
+    font-size: 0.7rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .s1 { background: var(--stage1); }
+  .s2 { background: var(--stage2); }
+  .s3 { background: var(--stage3); }
+  .s4 { background: var(--stage4); }
+  .s5 { background: var(--stage5); }
+
+  .stage-body {
+    background: var(--panel);
+    border: 1.5px solid;
+    border-top: none;
+    flex: 1;
+    padding: 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .stage:nth-child(1) .stage-body { border-color: var(--stage1); }
+  .stage:nth-child(2) .stage-body { border-color: var(--stage2); }
+  .stage:nth-child(3) .stage-body { border-color: var(--stage3); }
+  .stage:nth-child(4) .stage-body { border-color: var(--stage4); }
+  .stage:nth-child(5) .stage-body { border-color: var(--stage5); border-radius: 0 0 8px 8px; }
+  .stage:not(:nth-child(5)) .stage-body { border-right: none; }
+  .stage:nth-child(1) .stage-body { border-radius: 0 0 0 8px; }
+
+  .stage-title {
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 0.3rem;
+  }
+  .stage-desc {
+    font-size: 0.78rem;
+    color: var(--muted);
+    line-height: 1.5;
+    font-weight: 300;
+  }
+
+  .divider {
+    height: 1px;
+    background: linear-gradient(to right, #dde8f0, transparent);
+    margin: 0.4rem 0;
+  }
+
+  .resources-label {
+    font-size: 0.62rem;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+  }
+
+  .resource-item {
+    background: var(--bg);
+    border-radius: 6px;
+    padding: 0.65rem 0.8rem;
+    margin-bottom: 0.5rem;
+    border-left: 3px solid;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    cursor: default;
+  }
+  .resource-item:hover {
+    transform: translateX(2px);
+    box-shadow: 2px 2px 8px rgba(0,0,0,0.08);
+  }
+  .stage:nth-child(1) .resource-item { border-color: var(--stage1); }
+  .stage:nth-child(2) .resource-item { border-color: var(--stage2); }
+  .stage:nth-child(3) .resource-item { border-color: var(--stage3); }
+  .stage:nth-child(4) .resource-item { border-color: var(--stage4); }
+  .stage:nth-child(5) .resource-item { border-color: var(--stage5); }
+
+  .res-wp {
+    font-size: 0.58rem;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    margin-bottom: 0.25rem;
+    text-transform: uppercase;
+  }
+  .res-name {
+    font-size: 0.78rem;
+    font-weight: 600;
+    line-height: 1.35;
+    color: var(--text);
+  }
+  .res-name a {
+    color: var(--link);
+    text-decoration: none;
+    border-bottom: 1px dashed var(--link);
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .res-name a:hover {
+    color: var(--link-hover);
+    border-color: var(--link-hover);
+    border-bottom-style: solid;
+  }
+  .res-short {
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-top: 0.2rem;
+    font-weight: 300;
+  }
+
+  .url-badge {
+    display: block;
+    margin-top: 0.3rem;
+    font-size: 0.6rem;
+    font-family: 'JetBrains Mono', monospace;
+    background: #e8f2ff;
+    color: var(--link);
+    padding: 0.15rem 0.4rem;
+    border-radius: 3px;
+    border: 1px solid #b8d4f0;
+    word-break: break-all;
+    overflow-wrap: anywhere;
+  }
+
+  .center-panel {
+    background: linear-gradient(135deg, #f0f7ff, #e8f4e8);
+    border: 1.5px solid #b0c8e0;
+    border-radius: 10px;
+    padding: 1.2rem 1.8rem;
+    margin: 0 2rem 2rem;
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+  }
+  .center-panel-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+    color: #1a4060;
+  }
+  .center-panel-text {
+    font-size: 0.78rem;
+    color: var(--muted);
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  .resource-table-section {
+    padding: 2rem;
+    border-top: 1px solid #d0dce8;
+  }
+  .section-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: #1a3a5c;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, #b0c8e0, transparent);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  th {
+    background: #1a3a5c;
+    color: white;
+    padding: 0.7rem 1rem;
+    text-align: left;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+  }
+  td {
+    padding: 0.65rem 1rem;
+    border-bottom: 1px solid #eef0f4;
+    vertical-align: top;
+    line-height: 1.5;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #f5f9ff; }
+  td:first-child { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: var(--muted); }
+  td.url-cell { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; }
+  td.url-cell a { color: var(--link); }
+  td.url-cell span.empty { color: #ccd0d8; font-style: italic; }
+
+  .legend {
+    display: flex;
+    gap: 1.5rem;
+    padding: 1rem 2rem;
+    flex-wrap: wrap;
+    font-size: 0.75rem;
+    color: var(--muted);
+    align-items: center;
+  }
+  .legend-item { display: flex; align-items: center; gap: 0.4rem; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>CONTAGIO Tools: Supporting the EID Cohort Life Cycle</h1>
+  <p>Interactive resource overview — clickable when a URL is available</p>
+</header>
+
+<div class="legend">
+  <span style="font-weight:600; color:#1a3a5c;">Stages:</span>
+  <span class="legend-item"><span class="legend-dot" style="background:var(--stage1)"></span>Stage 1 – Explore</span>
+  <span class="legend-item"><span class="legend-dot" style="background:var(--stage2)"></span>Stage 2 – Study Set-Up</span>
+  <span class="legend-item"><span class="legend-dot" style="background:var(--stage3)"></span>Stage 3 – Collecting</span>
+  <span class="legend-item"><span class="legend-dot" style="background:var(--stage4)"></span>Stage 4 – Diagnostic Testing/Analysis</span>
+  <span class="legend-item"><span class="legend-dot" style="background:var(--stage5)"></span>Stage 5 – Sharing</span>
+  <span style="margin-left:auto; font-style:italic;">Underlined resources are clickable (URL available)</span>
+</div>
+
+<div class="lifecycle" id="lifecycle-container">
+  <!-- Stages rendered by JS -->
+</div>
+
+<div class="center-panel">
+  <div>
+    <div class="center-panel-title">🌐 Cohorts Network To be Activated Globally In Outbreaks</div>
+    <div class="center-panel-text">
+      A global consortium building the infrastructure to transition existing research cohorts into active outbreak response units. Work Packages (WPs) are functionally connected, providing continuous support rather than isolated silos.
+    </div>
+  </div>
+</div>
+
+<div class="resource-table-section">
+  <div class="section-title">Full resource table</div>
+  <table id="resource-table">
+    <thead>
+      <tr>
+        <th>res_id</th>
+        <th>res_text</th>
+        <th>res_short_descr</th>
+        <th>res_long_descr</th>
+        <th>res_url</th>
+        <th>Stage</th>
+        <th>WP</th>
+      </tr>
+    </thead>
+    <tbody id="table-body"></tbody>
+  </table>
+</div>
+
+<script>
+const resources = [
+  {
+    id: "R01",
+    text: "Consortium tool and Cohort inventory",
+    short: "Build consortium & cohort inventory",
+    long: "Tool to initiate a consortium by identifying international research groups with the required capacities to tackle an emerging outbreak.",
+    url: "https://contagio.shinyapps.io/StarterDashboard/",
+    stage: "Stage 1 - Explore",
+    wp: "WP1"
+  },
+  {
+    id: "R02",
+    text: "EMBL Pathogens Portal",
+    short: "Discovery of existing data and samples",
+    long: "Portal for discovering existing pathogen data and biological samples across international repositories.",
+    url: "",
+    stage: "Stage 1 - Explore",
+    wp: "WP1"
+  },
+  {
+    id: "R03",
+    text: "Standardized ethics/legal application protocols",
+    short: "Ethics & governance protocols",
+    long: "Standardized protocols for ethics and legal applications to reduce delays in study set-up caused by lengthy legal drafting.",
+    url: "",
+    stage: "Stage 2 - Study Set-Up",
+    wp: "WP3"
+  },
+  {
+    id: "R04",
+    text: "Broad Consent models for future use",
+    short: "Broad consent templates",
+    long: "Template consent models designed to cover future uses of collected data and samples under a broad consent framework.",
+    url: "",
+    stage: "Stage 2 - Study Set-Up",
+    wp: "WP3"
+  },
+  {
+    id: "R05",
+    text: "Data Transfer/Processing Agreement (DTA/DPA) templates",
+    short: "DTA/DPA agreement templates",
+    long: "Standardized templates for Data Transfer Agreements and Data Processing Agreements to facilitate legal data sharing between institutions.",
+    url: "",
+    stage: "Stage 2 - Study Set-Up",
+    wp: "WP3"
+  },
+  {
+    id: "R06",
+    text: "Templates for standardized sample collection and metadata",
+    short: "Sample collection & metadata templates",
+    long: "Standardized tools for multimodal data collection to ensure information is harmonized across different research sites.",
+    url: "",
+    stage: "Stage 3 - Collecting",
+    wp: "WP4"
+  },
+  {
+    id: "R07",
+    text: "Novel Bayesian guidance tool for diagnostic measurement errors",
+    short: "Bayesian diagnostic measurement tool",
+    long: "A novel Bayesian biostatistical guidance tool to ensure diagnostic data is accurate, interpretable, and generalizable across different tests.",
+    url: "",
+    stage: "Stage 4 - Diagnostic Testing",
+    wp: "WP2"
+  },
+  {
+    id: "R08",
+    text: "Diagnostic algorithm for coordinated implementation",
+    short: "Diagnostic algorithm",
+    long: "Diagnostic algorithm supporting coordinated implementation of standardized testing across consortium sites.",
+    url: "",
+    stage: "Stage 4 - Diagnostic Testing",
+    wp: "WP4"
+  },
+  {
+    id: "R09",
+    text: "Data Access Committee (DAC) roadmap",
+    short: "DAC governance roadmap",
+    long: "Roadmap document guiding the establishment and operation of a Data Access Committee for governing data sharing within the consortium.",
+    url: "",
+    stage: "Stage 5 - Sharing",
+    wp: "WP3"
+  },
+  {
+    id: "R10",
+    text: "Virtual Biorepository System (VBS) governance and sample sharing policies",
+    short: "VBS governance & sharing policies",
+    long: "Governance framework and policies for a Virtual Biorepository System facilitating the flow of physical samples and digital data amongst research partners.",
+    url: "",
+    stage: "Stage 5 - Sharing",
+    wp: "WP4"
+  }
+];
+
+const stages = [
+  {
+    key: "s1",
+    label: "Stage 1 – Explore",
+    cls: "s1",
+    title: "Finding Expertise and Collaborators",
+    desc: "Initiating a consortium by identifying international research groups with the required capacities to tackle an emerging outbreak.",
+    resIds: ["R01", "R02"]
+  },
+  {
+    key: "s2",
+    label: "Stage 2 – Study Set-Up",
+    cls: "s2",
+    title: "Ethics, Legal Approvals, and Consent",
+    desc: "Securing necessary ethical and legal frameworks without the delays typically caused by lengthy legal drafting.",
+    resIds: ["R03", "R04", "R05"]
+  },
+  {
+    key: "s3",
+    label: "Stage 3 – Collecting",
+    cls: "s3",
+    title: "Gathering High-Quality Samples and Data",
+    desc: "Deploying standardized tools for multimodal data collection to ensure information is harmonized across different research sites.",
+    resIds: ["R06"]
+  },
+  {
+    key: "s4",
+    label: "Stage 4 – Diagnostic Testing / Analysis",
+    cls: "s4",
+    title: "Addressing Measurement Errors and Standardization",
+    desc: "Utilizing advanced biostatistical tools to ensure diagnostic data is accurate, interpretable, and generalizable across different tests.",
+    resIds: ["R07", "R08"]
+  },
+  {
+    key: "s5",
+    label: "Stage 5 – Sharing",
+    cls: "s5",
+    title: "Distributing Data, Samples, and Expertise",
+    desc: "Facilitating the flow of physical samples and digital data amongst research partners through transparent governance and access policies.",
+    resIds: ["R09", "R10"]
+  }
+];
+
+function renderResourceTag(res) {
+  const nameHtml = res.url
+    ? `<a href="${res.url}" target="_blank" rel="noopener">${res.text}</a>`
+    : res.text;
+  return `
+    <div class="resource-item" title="${res.long}">
+      <div class="res-wp">${res.wp}</div>
+      <div class="res-name">${nameHtml}</div>
+      <div class="res-short">${res.short}</div>
+      ${res.url ? `<span class="url-badge">URL: ${res.url}</span>` : ''}
+    </div>
+  `;
+}
+
+// Render lifecycle
+const container = document.getElementById('lifecycle-container');
+stages.forEach((stage, i) => {
+  const stageResources = stage.resIds.map(id => resources.find(r => r.id === id));
+  const resHtml = stageResources.map(renderResourceTag).join('');
+
+  const div = document.createElement('div');
+  div.className = 'stage';
+  div.innerHTML = `
+    <div class="stage-header ${stage.cls}">${stage.label}</div>
+    <div class="stage-body">
+      <div>
+        <div class="stage-title">${stage.title}</div>
+        <div class="stage-desc">${stage.desc}</div>
+      </div>
+      <div class="divider"></div>
+      <div>
+        <div class="resources-label">Resources</div>
+        ${resHtml}
+      </div>
+    </div>
+  `;
+  container.appendChild(div);
+
+  // Add arrow connector between stages
+  if (i < stages.length - 1) {
+    const conn = document.createElement('div');
+    conn.style.cssText = 'display:flex;align-items:center;padding:0 4px;flex-shrink:0;';
+    conn.innerHTML = `<svg viewBox="0 0 20 20" width="20" height="20" fill="none">
+      <path d="M4 10 L14 10 M10 6 L14 10 L10 14" stroke="#94aec4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>`;
+    container.appendChild(conn);
+  }
+});
+
+// Render table
+const tbody = document.getElementById('table-body');
+resources.forEach(res => {
+  const urlCell = res.url
+    ? `<a href="${res.url}" target="_blank">${res.url}</a>`
+    : `<span class="empty">—</span>`;
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td>${res.id}</td>
+    <td>${res.text}</td>
+    <td>${res.short}</td>
+    <td style="color:#5a7a9a; font-size:0.72rem;">${res.long}</td>
+    <td class="url-cell">${urlCell}</td>
+    <td>${res.stage}</td>
+    <td style="font-family:monospace; font-size:0.72rem;">${res.wp}</td>
+  `;
+  tbody.appendChild(tr);
+});
+</script>
+
+</body>
+</html>
