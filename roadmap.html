@@ -409,11 +409,11 @@ function drawIcon(parent, type, cx, cy, sz, col) {
   } else if (type === 'cohort') {
     // Stage 1 decor: globe with 3 figures around it + rotation arrows
     // Globe in centre
-    el('circle', { ...base, cx: s * 0.5, cy: s * 0.5, r: s * 0.15, fill: 'white' }, g);
+    el('circle', { ...base, cx: s * 0.5, cy: s * 0.57, r: s * 0.15, fill: 'white' }, g);
     el('ellipse', { ...base, 'stroke-width': sw * 0.65,
-      cx: s * 0.5, cy: s * 0.5, rx: s * 0.06, ry: s * 0.15 }, g);
+      cx: s * 0.5, cy: s * 0.57, rx: s * 0.06, ry: s * 0.15 }, g);
     el('line', { ...base, 'stroke-width': sw * 0.65,
-      x1: s * 0.35, y1: s * 0.5, x2: s * 0.65, y2: s * 0.5 }, g);
+      x1: s * 0.35, y1: s * 0.57, x2: s * 0.65, y2: s * 0.57 }, g);
     // 3 figures around the globe (head + shoulders)
     // Top
     el('circle', { cx: s * 0.5,  cy: s * 0.16, r: s * 0.07, fill: col }, g);
