@@ -140,11 +140,11 @@
 const CSV_FILE = 'contagio_resources.csv';
 
 const STAGES = [
-  { key:'explore',    label:'EXPLORE AND PREPARE', stageMatch:'explore',    color:'#4a8fd4', dark:'#2d6090', title:'Finding Expertise\nand Collaborators',          desc:'Initiating a consortium by identifying international research groups with the required capacities to tackle an emerging outbreak.',    icon:'explore'    },
-  { key:'setup',      label:'STUDY SET-UP',        stageMatch:'set-up',     color:'#3aada0', dark:'#237a70', title:'Ethics, Legal Approvals,\nand Consent',             desc:'Securing necessary ethical and legal frameworks without the delays typically caused by lengthy legal drafting.',                         icon:'handshake'  },
-  { key:'collecting', label:'COLLECTING',          stageMatch:'collect',    color:'#5bb8c4', dark:'#358a96', title:'Gathering High-Quality\nSamples and Data',          desc:'Deploying standardized tools for multimodal data collection to ensure information is harmonized across different research sites.',       icon:'chart'      },
-  { key:'diagnostic', label:'DIAGNOSTIC TESTING',  stageMatch:'diagnostic', color:'#5a8fb8', dark:'#3a6080', title:'Addressing Measurement\nErrors & Standardization',  desc:'Utilizing advanced biostatistical tools to ensure diagnostic data is accurate, interpretable, and generalizable across different tests.', icon:'diagnostic' },
-  { key:'sharing',    label:'SHARING',             stageMatch:'shar',       color:'#2d5f8a', dark:'#1a3a5c', title:'Distributing Data,\nSamples, and Expertise',        desc:'Facilitating the flow of physical samples and digital data amongst research partners through transparent governance and access policies.', icon:'share'      },
+  { key:'explore',    label:'EXPLORE AND PREPARE', stageMatch:'explore',    color:'#4a8fd4', dark:'#2d6090', title:'Finding Expertise\nand Collaborators',             desc:'Initiating a consortium by identifying international research groups with the required capacities to tackle an emerging outbreak.',    icon:'explore'    },
+  { key:'setup',      label:'STUDY SET-UP',        stageMatch:'set-up',     color:'#3aada0', dark:'#237a70', title:'Ethics, Legal Approvals,\nand Consent',            desc:'Securing necessary ethical and legal frameworks without the delays typically caused by lengthy legal drafting.',                         icon:'handshake'  },
+  { key:'collecting', label:'COLLECTING',          stageMatch:'collect',    color:'#5bb8c4', dark:'#358a96', title:'Gathering High-Quality\nSamples and Data',         desc:'Deploying standardized tools for multimodal data collection to ensure information is harmonized across different research sites.',       icon:'chart'      },
+  { key:'diagnostic', label:'DIAGNOSTIC TESTING',  stageMatch:'diagnostic', color:'#5a8fb8', dark:'#3a6080', title:'Addressing Measurement\nErrors & Standardization', desc:'Utilizing advanced biostatistical tools to ensure diagnostic data is accurate, interpretable, and generalizable across different tests.', icon:'diagnostic' },
+  { key:'sharing',    label:'SHARING',             stageMatch:'shar',       color:'#2d5f8a', dark:'#1a3a5c', title:'Distributing Data,\nSamples, and Expertise',       desc:'Facilitating the flow of physical samples and digital data amongst research partners through trans- parent governance and access policies.', icon:'share'      },
 ];
 
 // ── CSV parser ────────────────────────────────────────────────────────────────
@@ -278,7 +278,7 @@ function render(resources) {
   });
 
   // Centre gradient
-  const cg = el('radialGradient', { id:'cg', cx:'40%', cy:'35%', r:'65%' }, defs);
+  const cg = el('radialGradient', { id:'cg', cx:'50%', cy:'50%', r:'100%' }, defs);
   el('stop', { offset:'0%',   'stop-color':'#3a7ab0' }, cg);
   el('stop', { offset:'100%', 'stop-color':'#1a3a5c' }, cg);
 
@@ -393,14 +393,18 @@ function render(resources) {
   el('circle', { cx:CX, cy:CY, r:CENTRE_R,   fill:'url(#cg)' }, svg);
 
   // Centre text
-  el('text', { x:CX, y:CY-44, 'font-family':'Nunito,sans-serif',
+  el('text', { x:CX, y:CY-70, 'font-family':'Nunito,sans-serif',
     'font-size':14.5, 'font-weight':900, fill:'white',
-    'text-anchor':'middle', 'letter-spacing':0.4 }, svg).textContent = 'Cohorts Network';
+    'text-anchor':'middle', 'letter-spacing':0.4 }, svg).textContent = 'CONTAGIO';
+  
+    el('text', { x:CX, y:CY-44, 'font-family':'Nunito,sans-serif',
+    'font-size':14.5, 'font-weight':900, fill:'rgba(255,255,255,0.8)',
+    'text-anchor':'middle', 'letter-spacing':0.4 }, svg).textContent = 'COhorts Network';
   el('text', { x:CX, y:CY-26, 'font-family':'Nunito,sans-serif',
-    'font-size':11, 'font-weight':600, fill:'rgba(255,255,255,0.78)',
+    'font-size':14.5, 'font-weight':900, fill:'rgba(255,255,255,0.8)',
     'text-anchor':'middle' }, svg).textContent = 'To be Activated Globally';
   el('text', { x:CX, y:CY-11, 'font-family':'Nunito,sans-serif',
-    'font-size':11, 'font-weight':600, fill:'rgba(255,255,255,0.78)',
+    'font-size':14.5, 'font-weight':900, fill:'rgba(255,255,255,0.8)',
     'text-anchor':'middle' }, svg).textContent = 'In Outbreaks';
 
   el('line', { x1:CX-68, y1:CY-3, x2:CX+68, y2:CY-3,
@@ -411,7 +415,7 @@ function render(resources) {
   bodyLines.slice(0,7).forEach((line, li) => {
     el('text', { x:CX, y:CY+14+li*13,
       'font-family':'Nunito Sans,sans-serif', 'font-size':11,
-      fill:'rgba(255,255,255,0.68)', 'text-anchor':'middle', 'font-weight':300
+      fill:'rgba(255,255,255,0.9)', 'text-anchor':'middle', 'font-weight':400
     }, svg).textContent = line;
   });
 
@@ -425,29 +429,32 @@ function render(resources) {
     el('circle', { cx:bx, cy:by, r:BUBBLE_R,   fill:`url(#sg${i})` }, svg);
 
     // Straight horizontal label above icon
-    el('text', { x:bx, y:by-68,
+  
+    el('text', { x:bx, y:by-60,
       'font-family':'Nunito,sans-serif', 'font-size':9, 'font-weight':900,
       'letter-spacing':1.5, fill:'white', 'text-anchor':'middle', opacity:0.92
     }, svg).textContent = st.label;
 
+    el('line', { x1:bx-50, y1:by-52, x2:bx+50, y2:by-52,
+    stroke:'rgba(255,255,255,0.28)', 'stroke-width':1 }, svg);
     // Icon
-    drawIcon(svg, st.icon, bx, by-32, 48, 'rgba(255,255,255,0.93)');
+    // drawIcon(svg, st.icon, bx, by-32, 48, 'rgba(255,255,255,0.93)');
 
     // Title
     const titleLines = st.title.split('\n');
     titleLines.forEach((line, li) => {
-      el('text', { x:bx, y:by + 14 + li*15,
-        'font-family':'Nunito,sans-serif', 'font-size':11.5,
-        'font-weight':800, fill:'white', 'text-anchor':'middle'
+      el('text', { x:bx, y:by + -32 + li*15,
+        'font-family':'Nunito,sans-serif', 'font-size':13,
+        'font-weight':900, fill:'white', 'text-anchor':'middle'
       }, svg).textContent = line;
     });
 
     // Description
-    const descY = by + 12 + titleLines.length*15 + 7;
-    wrapLines(st.desc, 18).slice(0,4).forEach((line, li) => {
+    const descY = by -46 + 12 + titleLines.length*15 + 7;
+    wrapLines(st.desc, 35).slice(0, 10).forEach((line, li) => {
       el('text', { x:bx, y:descY + li*11,
-        'font-family':'Nunito Sans,sans-serif', 'font-size':10,
-        fill:'rgba(255,255,255,0.80)', 'text-anchor':'middle', 'font-weight':300
+        'font-family':'Nunito Sans,sans-serif', 'font-size':11,
+        fill:'rgba(255,255,255,1.0)', 'text-anchor':'middle', 'font-weight':600
       }, svg).textContent = line;
     });
   });
