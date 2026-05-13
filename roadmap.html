@@ -623,42 +623,113 @@ function drawIcon(parent, type, cx, cy, sz, col) {
     el('circle', { cx: s * (pX + 0.005), cy: s * (pY + 0.005), r: s * 0.01, fill: col }, g);
  
   } else if (type === 'funnelChart') {
-    // Stage 5 decor: 3 downward arrows feeding a funnel that outputs to a chart screen
-    // Downward arrows at the top
-    const drawArrow = (ax) => {
-      el('line', { ...base, 'stroke-width': sw * 0.7,
-        x1: s * ax, y1: s * 0.04, x2: s * ax, y2: s * 0.18 }, g);
-      el('path', { fill: col, d:
-        `M${s * (ax - 0.04)},${s * 0.15}
-         L${s * ax},${s * 0.22}
-         L${s * (ax + 0.04)},${s * 0.15} Z` }, g);
+      // Stage 5 decor: arrows flowing into a funnel on the LEFT, monitor with
+    // bar chart, pie chart and text lines on the RIGHT.
+ 
+    // ── helpers ──
+    const dot = (dx, dy, r = 0.014) => {
+      el('circle', { cx: s * dx, cy: s * dy, r: s * r, fill: col }, g);
     };
-    drawArrow(0.22);
-    drawArrow(0.5);
-    drawArrow(0.78);
-    // Funnel
-    el('path', { ...base, fill: 'white', d:
-      `M${s * 0.06},${s * 0.26}
-       L${s * 0.94},${s * 0.26}
-       L${s * 0.62},${s * 0.5}
-       L${s * 0.62},${s * 0.6}
-       L${s * 0.38},${s * 0.6}
-       L${s * 0.38},${s * 0.5} Z` }, g);
-    // Monitor / screen
-    el('rect', { ...base, x: s * 0.12, y: s * 0.62, width: s * 0.76, height: s * 0.28,
-      rx: s * 0.03, fill: 'white' }, g);
-    // Bars inside screen
-    el('rect', { x: s * 0.2,  y: s * 0.78, width: s * 0.06, height: s * 0.08, fill: col }, g);
-    el('rect', { x: s * 0.28, y: s * 0.72, width: s * 0.06, height: s * 0.14, fill: col }, g);
-    el('rect', { x: s * 0.36, y: s * 0.76, width: s * 0.06, height: s * 0.1,  fill: col }, g);
-    // Pie chart
-    el('circle', { ...base, 'stroke-width': sw * 0.6,
-      cx: s * 0.62, cy: s * 0.78, r: s * 0.07, fill: 'white' }, g);
+    const arrowHeadDown = (dx, dy, w = 0.022) => {
+      el('path', { fill: col, d:
+        `M${s * (dx - w)},${s * (dy - w * 1.15)}
+         L${s * dx},${s * dy}
+         L${s * (dx + w)},${s * (dy - w * 1.15)} Z` }, g);
+    };
+    // Curved arrow with an L-shaped bend, ending downward into the funnel mouth
+    const curvedArrow = (sx, sy, ex, ey) => {
+      dot(sx, sy);
+      el('path', { stroke: col, 'stroke-width': sw * 0.55, fill: 'none',
+        'stroke-linecap': 'round', d:
+        `M${s * sx},${s * sy} Q${s * ex},${s * sy} ${s * ex},${s * ey}` }, g);
+      arrowHeadDown(ex, ey + 0.01);
+    };
+ 
+    // ── 5 arrows feeding the funnel ──
+    // Center: vertical dashed arrow straight down
+    el('line', { stroke: col, 'stroke-width': sw * 0.55,
+      'stroke-dasharray': `${s * 0.022},${s * 0.018}`,
+      'stroke-linecap': 'round',
+      x1: s * 0.22, y1: s * 0.04, x2: s * 0.22, y2: s * 0.25 }, g);
+    arrowHeadDown(0.22, 0.27);
+    // 2 curved arrows on each side
+    curvedArrow(0.04, 0.13, 0.13, 0.27);  // far-left
+    curvedArrow(0.15, 0.04, 0.18, 0.27);  // near-left
+    curvedArrow(0.29, 0.04, 0.26, 0.27);  // near-right
+    curvedArrow(0.40, 0.13, 0.31, 0.27);  // far-right
+ 
+    // ── Funnel ──
+    // Body (trapezoid + vertical spout)
+    el('path', { ...base, 'stroke-width': sw * 0.55, fill: lighten(col, 30), d:
+      `M${s * 0.03},${s * 0.30}
+       L${s * 0.41},${s * 0.30}
+       L${s * 0.25},${s * 0.62}
+       L${s * 0.25},${s * 0.92}
+       L${s * 0.19},${s * 0.92}
+       L${s * 0.19},${s * 0.62} Z` }, g);
+    // Top rim ellipse — slightly darker, suggests open mouth viewed at an angle
+    el('ellipse', { stroke: col, 'stroke-width': sw * 0.55,
+      fill: lighten(col, 15),
+      cx: s * 0.22, cy: s * 0.30, rx: s * 0.19, ry: s * 0.04 }, g);
+ 
+    // ── Monitor (right side) ──
+    // Screen
+    el('rect', { ...base, 'stroke-width': sw * 0.55,
+      x: s * 0.44, y: s * 0.12, width: s * 0.54, height: s * 0.55,
+      rx: s * 0.025, fill: lighten(col, 55) }, g);
+    // Stand neck (trapezoidal — narrower at the top where it meets the screen)
+    el('path', { ...base, 'stroke-width': sw * 0.5, fill: lighten(col, 30), d:
+      `M${s * 0.67},${s * 0.67}
+       L${s * 0.75},${s * 0.67}
+       L${s * 0.78},${s * 0.85}
+       L${s * 0.64},${s * 0.85} Z` }, g);
+    // Base (horizontal foot)
+    el('rect', { ...base, 'stroke-width': sw * 0.5,
+      x: s * 0.56, y: s * 0.85, width: s * 0.30, height: s * 0.035,
+      rx: s * 0.018, fill: col }, g);
+ 
+    // ── Screen contents ──
+    // Top header lines (2 short bars suggesting a heading + sub-heading)
+    el('line', { stroke: col, 'stroke-width': sw * 0.55, 'stroke-linecap': 'round',
+      x1: s * 0.48, y1: s * 0.21, x2: s * 0.63, y2: s * 0.21 }, g);
+    el('line', { stroke: col, 'stroke-width': sw * 0.55, 'stroke-linecap': 'round',
+      x1: s * 0.48, y1: s * 0.26, x2: s * 0.58, y2: s * 0.26 }, g);
+ 
+    // Bar chart (5 bars of varying heights, sharing a baseline)
+    const baseY = 0.58, bw = 0.034, bx0 = 0.48;
+    const heights = [0.10, 0.16, 0.23, 0.27, 0.18];
+    heights.forEach((h, i) => {
+      el('rect', { x: s * (bx0 + i * 0.044), y: s * (baseY - h),
+        width: s * bw, height: s * h, fill: col }, g);
+    });
+    // Subtle baseline under the bars
+    el('line', { stroke: col, 'stroke-width': sw * 0.35, opacity: 0.7,
+      x1: s * 0.47, y1: s * baseY, x2: s * 0.71, y2: s * baseY }, g);
+ 
+    // Pie chart (top-right of screen)
+    const pieX = 0.84, pieY = 0.31, pieR = 0.08;
+    el('circle', { ...base, 'stroke-width': sw * 0.5,
+      cx: s * pieX, cy: s * pieY, r: s * pieR, fill: lighten(col, 40) }, g);
+    // Darker wedge (~60° at top-right)
     el('path', { fill: col, d:
-      `M${s * 0.62},${s * 0.78}
-       L${s * 0.62},${s * 0.71}
-       A${s * 0.07},${s * 0.07} 0 0 1 ${s * 0.69},${s * 0.78} Z` }, g);
-
+      `M${s * pieX},${s * pieY}
+       L${s * pieX},${s * (pieY - pieR)}
+       A${s * pieR},${s * pieR} 0 0 1 ${s * (pieX + pieR * 0.866)},${s * (pieY - pieR * 0.5)} Z` }, g);
+    // Medium wedge (~90° on the right side)
+    el('path', { fill: lighten(col, 25), d:
+      `M${s * pieX},${s * pieY}
+       L${s * (pieX + pieR * 0.866)},${s * (pieY - pieR * 0.5)}
+       A${s * pieR},${s * pieR} 0 0 1 ${s * (pieX + pieR * 0.5)},${s * (pieY + pieR * 0.866)} Z` }, g);
+ 
+    // Bottom-right text lines (small)
+    el('line', { stroke: col, 'stroke-width': sw * 0.55, 'stroke-linecap': 'round',
+      x1: s * 0.77, y1: s * 0.47, x2: s * 0.93, y2: s * 0.47 }, g);
+    el('line', { stroke: col, 'stroke-width': sw * 0.55, 'stroke-linecap': 'round',
+      x1: s * 0.77, y1: s * 0.52, x2: s * 0.86, y2: s * 0.52 }, g);
+ 
+    // Small power-button dot near the bottom of the screen
+    el('circle', { cx: s * 0.71, cy: s * 0.63, r: s * 0.008, fill: col }, g);
+ 
   } else if (type === 'dot') {
     el('circle', { cx: s * 0.5, cy: s * 0.5, r: s * 0.18, fill: col }, g);
   }  else if (type === 'link') {
