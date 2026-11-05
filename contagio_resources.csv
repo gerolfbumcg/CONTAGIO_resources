@@ -12,4 +12,4 @@ R10,Virtual Biorepository System (VBS) governance and sample sharing policies,VB
 R11,e-CRF builder,Web application for the creation of Clinical Report Forms (CRFs),e-CRF builder,https://bridge.isaric.org/main,Stage 3 - Collecting,WP2
 R12,Virtual Biorepository System (VBS) informed consent template,Informed Consent Temaplate,,,Stage 5 - Sharing,WP4
 R13,Virtual Biorepository System (VBS) protocol template,Protocol Temaplate,,,Stage 5 - Sharing,WP4
-R14,Language Integration Network Kit (LINK),Validate machine translations of e-CRFs,All e-CRFs are automatically machine-translated into Spanish, Portuguese, and French. LINK lets bilingual volunteers review and edit these translations.,https://link-mgea.vercel.app/,Stage 3 - Collecting,WP2
+R14,Language Integration Network Kit (LINK),Validate machine translations of e-CRFs,"All e-CRFs are automatically machine-translated into Spanish, Portuguese, and French. LINK lets bilingual volunteers review and edit these translations.",https://link-mgea.vercel.app/,Stage 3 - Collecting,WP2
