@@ -442,7 +442,8 @@ function drawIcon(parent, type, cx, cy, sz, col) {
 const SI = { line: '#24384f', mid: '#5f87b0', light: '#c4d6e8', white: '#ffffff' };
 
 function drawStageIcon(parent, type, cx, cy, w) {
-  const k = w / 100;
+  // The square cohort icon is scaled up a little to match the slide's visual weight.
+  const k = w / 100 * (type === 'cohort' ? 1.12 : 1);
   const g = el('g', {
     transform: `translate(${cx - 50 * k},${cy - 36 * k}) scale(${k})`,
     'stroke-linecap': 'round', 'stroke-linejoin': 'round'
@@ -472,149 +473,221 @@ function drawStageIcon(parent, type, cx, cy, w) {
       fill: L, stroke: L, 'stroke-width': 1 }, g);
 
   if (type === 'cohort') {
-    // ── Globe in the centre ──
-    const gx = 50, gy = 38, gr = 11;
-    el('circle', { cx: gx, cy: gy, r: gr, ...o(M) }, g);
-    el('ellipse', { cx: gx, cy: gy, rx: 4.8, ry: gr, fill: 'none', stroke: L, 'stroke-width': 1.5 }, g);
-    ln(gx - gr, gy, gx + gr, gy, 1.5);
-    ln(gx, gy - gr, gx, gy + gr, 1.5);
-    el('path', { d: `M${gx - 9.5},${gy - 5.5} Q${gx},${gy - 3} ${gx + 9.5},${gy - 5.5}`, fill: 'none', stroke: L, 'stroke-width': 1.3 }, g);
-    el('path', { d: `M${gx - 9.5},${gy + 5.5} Q${gx},${gy + 3} ${gx + 9.5},${gy + 5.5}`, fill: 'none', stroke: L, 'stroke-width': 1.3 }, g);
+    // Proportions measured from slide 5: roughly square (≈ 1 : 1), centred in the box.
+    // Orbit ring links 3 person badges + 3 small slate dots; 3 clockwise
+    // arrows run inside the orbit around a teal grid globe.
+    const slate = '#56687e', badge = '#8db5c6', globe = '#6e9db3';
+    const ox = 50, oy = 38.5, OR = 27.7;
+    const P = (a, r = OR) => [ox + r * Math.cos(a * Math.PI / 180), oy + r * Math.sin(a * Math.PI / 180)];
 
-    // ── Rotation arrows on an orbit between the badges ──
-    const R = 26;
-    const P = a => [gx + R * Math.cos(a * Math.PI / 180), gy + R * Math.sin(a * Math.PI / 180)];
-    [[-60, 2], [60, 122], [180, 242]].forEach(([a1, a2]) => {
-      const [x1, y1] = P(a1), [x2, y2] = P(a2);
-      el('path', { d: `M${x1},${y1} A${R},${R} 0 0 1 ${x2},${y2}`, fill: 'none', stroke: L, 'stroke-width': 2 }, g);
-      // Arrowhead pointing along the clockwise tangent
-      const t = a2 * Math.PI / 180, tx = -Math.sin(t), ty = Math.cos(t);
-      const nx = Math.cos(t), ny = Math.sin(t), h = 4.2;
-      el('path', { d: `M${x2 + tx * h},${y2 + ty * h}
-        L${x2 - tx * h * 0.4 + nx * h * 0.9},${y2 - ty * h * 0.4 + ny * h * 0.9}
-        L${x2 - tx * h * 0.4 - nx * h * 0.9},${y2 - ty * h * 0.4 - ny * h * 0.9} Z`,
-        fill: L, stroke: L, 'stroke-width': 1 }, g);
+    // Orbit ring
+    el('circle', { cx: ox, cy: oy, r: OR, fill: 'none', stroke: L, 'stroke-width': 1.4 }, g);
+    // Small slate dots on the orbit
+    [-150, -30, 90].forEach(a => {
+      const [x, y] = P(a);
+      el('circle', { cx: x, cy: y, r: 3.4, ...o(slate, 1.3) }, g);
     });
 
-    // ── Three person badges (top, bottom-left, bottom-right) ──
-    [-90, 30, 150].forEach(a => {
+    // Inner clockwise arrows
+    const IR = 21.5;
+    [[184, 236], [303, 355], [58, 119]].forEach(([a1, a2]) => {
+      const [x1, y1] = P(a1, IR), [x2, y2] = P(a2, IR);
+      el('path', { d: `M${x1},${y1} A${IR},${IR} 0 0 1 ${x2},${y2}`, fill: 'none', stroke: L, 'stroke-width': 1.5 }, g);
+      const t = a2 * Math.PI / 180, tx = -Math.sin(t), ty = Math.cos(t);
+      const nx = Math.cos(t), ny = Math.sin(t), h = 3;
+      el('path', { d: `M${x2 + tx * h},${y2 + ty * h}
+        L${x2 - tx * h * 0.3 + nx * h * 0.8},${y2 - ty * h * 0.3 + ny * h * 0.8}
+        L${x2 - tx * h * 0.3 - nx * h * 0.8},${y2 - ty * h * 0.3 - ny * h * 0.8} Z`,
+        fill: L, stroke: L, 'stroke-width': 0.8 }, g);
+    });
+
+    // Globe with grid
+    const gr = 12.2;
+    el('circle', { cx: ox, cy: oy, r: gr, ...o(globe, 1.6) }, g);
+    el('ellipse', { cx: ox, cy: oy, rx: gr * 0.5, ry: gr, fill: 'none', stroke: L, 'stroke-width': 1.1 }, g);
+    ln(ox, oy - gr, ox, oy + gr, 1.1);
+    [-0.5, 0, 0.5].forEach(f => {
+      const y = oy + f * gr, hw = Math.sqrt(gr * gr - (f * gr) ** 2);
+      ln(ox - hw, y, ox + hw, y, 1.1);
+    });
+
+    // Person badges (top, bottom-left, bottom-right)
+    const BR = 10.8;
+    [-90, 150, 30].forEach(a => {
       const [bx, by] = P(a);
-      const br = 10.5;
-      el('circle', { cx: bx, cy: by, r: br, ...o(Lt) }, g);
-      el('path', { d: `M${bx - 6.8},${by + 7.8} Q${bx - 6.8},${by + 1.6} ${bx},${by + 1.6}
-                       Q${bx + 6.8},${by + 1.6} ${bx + 6.8},${by + 7.8}`, ...o(M, 1.5) }, g);
-      el('circle', { cx: bx, cy: by - 3, r: 3.7, ...o(M, 1.5) }, g);
+      el('circle', { cx: bx, cy: by, r: BR, fill: badge, stroke: 'none' }, g);
+      const dx = 7.4, dy = Math.sqrt(BR * BR - dx * dx);
+      el('path', { d: `M${bx - dx},${by + dy} C${bx - dx},${by + 0.6} ${bx + dx},${by + 0.6} ${bx + dx},${by + dy}
+                       A${BR},${BR} 0 0 1 ${bx - dx},${by + dy} Z`, ...o(slate, 1.3) }, g);
+      el('circle', { cx: bx, cy: by - 3.2, r: 3.9, ...o(badge, 1.4) }, g);
+      el('circle', { cx: bx, cy: by, r: BR, fill: 'none', stroke: L, 'stroke-width': 1.8 }, g);
     });
 
   } else if (type === 'tabletVial') {
-    // ── Tablet ──
-    el('rect', { x: 16, y: 1, width: 40, height: 70, rx: 5, ...o(M, 2.6) }, g);
-    el('rect', { x: 20.5, y: 6, width: 31, height: 55, rx: 1.5, ...o(Wh, 1.5) }, g);
-    el('circle', { cx: 36, cy: 66, r: 2.2, ...o(Wh, 1.4) }, g);
-    // Screen content: image box, heading lines, text lines, line chart
-    el('rect', { x: 24, y: 10, width: 10, height: 9, ...o(M, 1.3) }, g);
-    ln(37, 12, 48, 12); ln(37, 16.5, 46, 16.5);
-    ln(24, 25, 48, 25); ln(24, 30, 48, 30); ln(24, 35, 44, 35); ln(24, 40, 48, 40);
-    el('polyline', { points: '24,56 29,51 33,54 38,46 42,51 48,48', fill: 'none', stroke: L, 'stroke-width': 1.6 }, g);
-    ln(24, 58, 48, 58, 1.2);
+    // Proportions measured from slide 5: whole icon ≈ 1.32 : 1 (w : h),
+    // tablet ≈ 0.73 : 1, slate bezel/rack, pale screen, light-blue liquid.
+    const slate = '#56687e', screen = '#e6edf3', liquid = '#a6bfd2';
+    const t = 1.3;                                   // text-line stroke
 
-    // ── Test tube in a rack ──
-    // Tube body + liquid
-    el('path', { d: 'M66,11 L66,56 a5,5 0 0 0 10,0 L76,11 Z', ...o(Wh) }, g);
-    el('path', { d: 'M66,33 L66,56 a5,5 0 0 0 10,0 L76,33 Z', fill: M, stroke: L, 'stroke-width': 1.4 }, g);
+    // ── Tablet ──
+    el('rect', { x: 2.5, y: 0, width: 52.8, height: 72, rx: 4.4, ...o(slate, 1.8) }, g);
+    el('rect', { x: 7.3, y: 5.3, width: 43.2, height: 56.3, rx: 0.8, ...o(screen, 1.2) }, g);
+    el('circle', { cx: 28.9, cy: 66.6, r: 2, fill: 'none', stroke: L, 'stroke-width': 1.3 }, g);
+    // Screen content: image box + 3 heading lines
+    el('rect', { x: 12.4, y: 10.3, width: 12.1, height: 13.2, ...o(slate, 1.1) }, g);
+    ln(30, 12.5, 45.4, 12.5, t); ln(30, 16.4, 45.4, 16.4, t); ln(30, 20.7, 38.8, 20.7, t);
+    // 3 bullet lines
+    [[30.1, 45.4], [34.9, 45.4], [40.5, 37.7]].forEach(([y, x2]) => {
+      el('circle', { cx: 13.6, cy: y, r: 0.9, fill: L }, g);
+      ln(17.5, y, x2, y, t);
+    });
+    // Short line, then bottom row: line left + signature squiggle right
+    ln(12.4, 46.2, 26.7, 46.2, t);
+    ln(12.4, 54.3, 26.7, 54.3, t);
+    el('path', { d: 'M33,52 q1.6,-5 3.2,-2.4 t3.2,0.6 t3.4,-0.4 t2.6,0.8',
+      fill: 'none', stroke: L, 'stroke-width': t }, g);
+    ln(32.2, 54.3, 46.5, 54.3, t);
+
+    // ── Test tube ──
+    el('path', { d: 'M73.3,9.2 L73.3,56.7 a6.4,6.4 0 0 0 12.8,0 L86.1,9.2 Z', ...o(Wh, 1.6) }, g);
+    el('path', { d: 'M73.3,17.6 L73.3,56.7 a6.4,6.4 0 0 0 12.8,0 L86.1,17.6 Z',
+      fill: liquid, stroke: L, 'stroke-width': 1.6 }, g);
+    el('rect', { x: 74.6, y: 25.7, width: 4.6, height: 13.2, fill: Wh, stroke: L, 'stroke-width': 0.9 }, g);
     // Ribbed cap
-    el('rect', { x: 63.5, y: 2, width: 15, height: 9.5, rx: 1.5, ...o(M) }, g);
-    [66.5, 69.5, 72.5, 75.5].forEach(x => ln(x, 3.5, x, 10, 1.2));
-    // Rack: crossbar, legs, base
-    el('rect', { x: 59, y: 38, width: 24, height: 5, rx: 1, ...o(M, 2) }, g);
-    el('rect', { x: 60, y: 43, width: 4.5, height: 23, ...o(M, 2) }, g);
-    el('rect', { x: 77.5, y: 43, width: 4.5, height: 23, ...o(M, 2) }, g);
-    el('rect', { x: 57, y: 65.5, width: 28, height: 5, rx: 1, ...o(M, 2) }, g);
-    // Re-draw tube front over the crossbar so it reads as "through" the rack
-    el('rect', { x: 66, y: 38, width: 10, height: 5, fill: M, stroke: 'none' }, g);
-    ln(66, 38, 66, 43, 2.4); ln(76, 38, 76, 43, 2.4);
+    el('rect', { x: 70.3, y: 0, width: 18.4, height: 9.2, rx: 2, ...o(slate, 1.6) }, g);
+    [73.4, 76.4, 79.5, 82.6, 85.6].forEach(x => ln(x, 1.6, x, 7.6, 1));
+
+    // ── Rack (crossbar in front of the tube, two legs, base) ──
+    el('rect', { x: 63.7, y: 46.6, width: 3.7, height: 20.4, ...o(slate, 1.4) }, g);
+    el('rect', { x: 91.2, y: 46.6, width: 3.7, height: 20.4, ...o(slate, 1.4) }, g);
+    el('rect', { x: 60.8, y: 42.2, width: 36.7, height: 4.4, rx: 0.6, ...o(slate, 1.6) }, g);
+    el('rect', { x: 60.8, y: 66.9, width: 36.7, height: 5.1, rx: 0.6, ...o(slate, 1.6) }, g);
 
   } else if (type === 'shieldCert') {
-    // ── Shield with check mark ──
-    el('path', { d: 'M28,3 L47,9.5 L47,34 Q47,58 28,70 Q9,58 9,34 L9,9.5 Z', ...o(M, 2.6) }, g);
-    el('path', { d: 'M28,9.5 L41.5,14 L41.5,34 Q41.5,53 28,63 Q14.5,53 14.5,34 L14.5,14 Z', ...o(Lt, 1.5) }, g);
-    el('path', { d: 'M19.5,36 L26,43.5 L37.5,27', fill: 'none', stroke: L, 'stroke-width': 5 }, g);
+    // Proportions measured from slide 5: whole icon ≈ 1.53 : 1 (w : h);
+    // shield and certificate each ≈ 0.78 : 1.
+    const slate = '#56687e', shieldIn = '#c9daea', paper = '#e3e8ee', fold = '#c3ccd6';
 
-    // ── Certificate with dog-ear ──
-    el('path', { d: 'M54,5 L80,5 L91,16 L91,69 L54,69 Z', ...o(Wh) }, g);
-    el('path', { d: 'M80,5 L80,16 L91,16 Z', ...o(Lt, 1.8) }, g);
-    ln(59, 13, 75, 13, 2); ln(59, 23, 86, 23); ln(59, 30, 86, 30);
-    ln(59, 37, 86, 37); ln(59, 44, 78, 44); ln(59, 60, 70, 60, 1.4);
+    // ── Shield: slate band, light-blue inside, outlined slate check ──
+    el('path', { d: `M23.3,3.5 Q35,10 46.7,12.6 L46.7,35 Q46.7,52 23.3,63.3
+                     Q0,52 0,35 L0,12.6 Q11.6,10 23.3,3.5 Z`, ...o(slate, 1.7) }, g);
+    el('path', { d: `M23.3,9 Q32.5,14 41.9,16.2 L41.9,35 Q41.9,49 23.3,58
+                     Q4.8,49 4.8,35 L4.8,16.2 Q14,14 23.3,9 Z`, ...o(shieldIn, 1.4) }, g);
+    el('path', { d: 'M12,33.9 L19.6,41.5 L35.9,25.8', fill: 'none', stroke: L, 'stroke-width': 7.6 }, g);
+    el('path', { d: 'M12,33.9 L19.6,41.5 L35.9,25.8', fill: 'none', stroke: slate, 'stroke-width': 4.4 }, g);
 
-    // ── Rosette seal with ribbon tails ──
-    const sx = 81, sy = 55;
-    el('path', { d: `M${sx - 5},${sy + 4} L${sx - 8},${sy + 16} L${sx - 4},${sy + 13.5} L${sx - 1.5},${sy + 17} L${sx},${sy + 5} Z`, ...o(M, 1.3) }, g);
-    el('path', { d: `M${sx + 5},${sy + 4} L${sx + 8},${sy + 16} L${sx + 4},${sy + 13.5} L${sx + 1.5},${sy + 17} L${sx},${sy + 5} Z`, ...o(M, 1.3) }, g);
+    // ── Certificate with folded corner ──
+    el('path', { d: 'M53.3,3.5 L87,3.5 L100,16.5 L100,63.3 L53.3,63.3 Z', ...o(paper, 1.7) }, g);
+    el('path', { d: 'M87,3.5 L87,16.5 L100,16.5 Z', ...o(fold, 1.4) }, g);
+    ln(61.3, 17.6, 77.2, 17.6, 1.3);
+    ln(61.3, 24.2, 91.3, 24.2, 1.3);
+    ln(61.3, 29.6, 91.3, 29.6, 1.3);
+    ln(61.3, 35, 91.3, 35, 1.3);
+    ln(61.3, 50.2, 72.8, 50.2, 1.3);
+
+    // ── Seal: notched ribbon below, scalloped slate rosette ──
+    const sx = 85.4, sy = 49.2;
+    el('path', { d: `M80.3,${sy} L80.3,68.7 L85.6,65 L90.9,68.7 L90.9,${sy} Z`, ...o(slate, 1.4) }, g);
     const pts = [];
-    for (let i = 0; i < 24; i++) {
-      const a = (i / 24) * Math.PI * 2, r = i % 2 ? 7 : 8.4;
+    for (let i = 0; i < 28; i++) {
+      const a = (i / 28) * Math.PI * 2, r = i % 2 ? 7.4 : 8.4;
       pts.push(`${sx + Math.cos(a) * r},${sy + Math.sin(a) * r}`);
     }
-    el('polygon', { points: pts.join(' '), ...o(M, 1.4) }, g);
-    el('circle', { cx: sx, cy: sy, r: 4.2, fill: Lt, stroke: L, 'stroke-width': 1.2 }, g);
+    el('polygon', { points: pts.join(' '), ...o(slate, 1.3) }, g);
+    el('circle', { cx: sx, cy: sy, r: 4.8, fill: '#6f8196', stroke: L, 'stroke-width': 1.2 }, g);
 
   } else if (type === 'cloudData') {
-    // ── Cloud ──
-    el('path', { d: 'M11,31 a8,8 0 0 1 1.5,-15.8 a11.5,11.5 0 0 1 21,-5.5 a9.5,9.5 0 0 1 15.5,6 a7.7,7.7 0 0 1 -1,15.3 Z', ...o(Lt) }, g);
-    // ── Database in front of the cloud ──
-    el('path', { d: 'M19,17 L19,36 a9,3.2 0 0 0 18,0 L37,17 Z', ...o(M) }, g);
-    el('path', { d: 'M19,23.3 a9,3.2 0 0 0 18,0', fill: 'none', stroke: L, 'stroke-width': 1.5 }, g);
-    el('path', { d: 'M19,29.6 a9,3.2 0 0 0 18,0', fill: 'none', stroke: L, 'stroke-width': 1.5 }, g);
-    el('ellipse', { cx: 28, cy: 17, rx: 9, ry: 3.2, ...o(Lt, 2) }, g);
-    // ── Org tree below ──
-    ln(28, 39.5, 28, 46, 2); ln(12.5, 46, 43.5, 46, 2);
-    [12.5, 28, 43.5].forEach(x => {
-      ln(x, 46, x, 51, 2);
-      el('rect', { x: x - 5, y: 51, width: 10, height: 9, rx: 1, ...o(M, 1.8) }, g);
+    // Proportions measured from slide 5: whole icon ≈ 1.48 : 1 (w : h).
+    const slate = '#56687e', cloud = '#c9dcec', dbTop = '#a9bfcf',
+          box = '#8fb4c8', dish = '#cddcea';
+
+    // ── Cloud (behind the database, right part hidden by the dish) ──
+    el('path', { d: `M8,31.3 C1,31.3 -0.5,20 6.5,17 C7.5,8 18,4 25,8
+                     C29,1 44,1 48,8 C55,8 60,14 59.8,21 L59.8,31.3 Z`, ...o(cloud, 1.5) }, g);
+
+    // ── Database: slate body with two bands, pale top ──
+    const dx1 = 15.8, dx2 = 44.5, dcx = 30.15, drx = 14.35, dry = 3.4;
+    el('path', { d: `M${dx1},19.6 L${dx1},39.2 A${drx},${dry} 0 0 0 ${dx2},39.2 L${dx2},19.6 Z`, ...o(slate, 1.6) }, g);
+    el('path', { d: `M${dx1},26.8 A${drx},${dry} 0 0 0 ${dx2},26.8`, fill: 'none', stroke: L, 'stroke-width': 1.3 }, g);
+    el('path', { d: `M${dx1},33.6 A${drx},${dry} 0 0 0 ${dx2},33.6`, fill: 'none', stroke: L, 'stroke-width': 1.3 }, g);
+    el('ellipse', { cx: dcx, cy: 19.6, rx: drx, ry: dry, ...o(dbTop, 1.5) }, g);
+    el('circle', { cx: 40, cy: 26.5, r: 0.8, fill: Lt }, g);
+    el('circle', { cx: 40, cy: 33.3, r: 0.8, fill: Lt }, g);
+    // Connector to the dish
+    ln(44.5, 30.9, 51.4, 30.9, 1.3);
+
+    // ── Tree of 3 boxes under the database ──
+    ln(dcx, 42.6, dcx, 45.3, 1.4);
+    ln(18.6, 45.3, 42.3, 45.3, 1.4);
+    [[14.7, 18.6], [26.2, 30.15], [38.4, 42.3]].forEach(([x, c]) => {
+      ln(c, 45.3, c, 49.4, 1.4);
+      el('rect', { x, y: 49.4, width: 7.9, height: 7.2, rx: 0.6, ...o(box, 1.3) }, g);
     });
 
-    // ── Petri dish with microbes ──
-    const px = 75, py = 40;
-    el('circle', { cx: px, cy: py, r: 23.5, ...o(Wh, 3.4) }, g);
-    el('circle', { cx: px, cy: py, r: 19, fill: Lt, stroke: L, 'stroke-width': 1.4 }, g);
-    blob(px - 6, py - 7, 6.5, [1, 0.8, 1.1, 0.75, 1.05, 0.85, 1.15, 0.8]);
-    blob(px + 5, py + 7.5, 5.5, [1, 0.85, 1.1, 0.9, 0.8, 1.1, 0.95]);
-    el('ellipse', { cx: px + 8, cy: py - 8, rx: 5, ry: 2.6, transform: `rotate(-35 ${px + 8} ${py - 8})`, ...o(M, 1.3) }, g);
-    el('circle', { cx: px - 9, cy: py + 7, r: 2.6, ...o(M, 1.2) }, g);
-    el('circle', { cx: px + 12, cy: py + 2, r: 1.8, ...o(M, 1.1) }, g);
-    el('circle', { cx: px - 1, cy: py + 1, r: 1.5, fill: L }, g);
-    el('circle', { cx: px - 3, cy: py + 13, r: 1.3, fill: L }, g);
+    // ── Petri dish: thick slate rim, light inside ──
+    const px = 75.6, py = 43.8;
+    el('circle', { cx: px, cy: py, r: 24.4, ...o(slate, 1.5) }, g);
+    el('circle', { cx: px, cy: py, r: 20.8, ...o(dish, 1.4) }, g);
+    // Microbes
+    blob(66.6, 35.9, 3.2, [1.7, 0.6, 1.5, 0.55, 1.8, 0.6, 1.4, 0.55, 1.6, 0.6], slate, 1);
+    const sp = [];
+    for (let i = 0; i < 16; i++) {
+      const a = (i / 16) * Math.PI * 2, r = i % 2 ? 4.3 : 5.1;
+      sp.push(`${81.3 + Math.cos(a) * r},${35.9 + Math.sin(a) * r}`);
+    }
+    el('polygon', { points: sp.join(' '), ...o(slate, 1) }, g);
+    el('circle', { cx: 80.2, cy: 35.2, r: 0.6, fill: L }, g);
+    el('circle', { cx: 82.4, cy: 36.6, r: 0.6, fill: L }, g);
+    el('path', { d: `M63,52 C63,48.5 68,48.6 70.5,50.2 C73,48 78,49 77.8,53 C77.6,57.5 71,57.6 69.5,56.4
+                     C67.5,58 63,57 63,52 Z`, ...o(slate, 1) }, g);
+    el('circle', { cx: 86.9, cy: 50.5, r: 2.7, ...o(slate, 1) }, g);
+    el('line', { x1: 66.1, y1: 43.8, x2: 77.9, y2: 39.2, stroke: L, 'stroke-width': 1, 'stroke-dasharray': '1.6,1.4' }, g);
+    [[59.8, 45.3], [89.6, 40.4], [83.5, 58.4], [74.5, 28]].forEach(([x, y]) =>
+      el('circle', { cx: x, cy: y, r: 0.75, fill: L }, g));
 
   } else if (type === 'funnelChart') {
-    // ── Five arrows flowing into the funnel ──
-    el('line', { x1: 24, y1: 2, x2: 24, y2: 17, stroke: L, 'stroke-width': 2, 'stroke-dasharray': '2.5,2.5' }, g);
-    headDown(24, 21);
-    [[5, 8, 12], [14.5, 2, 18], [33.5, 2, 30], [43, 8, 36]].forEach(([sx, sy, ex]) => {
-      el('circle', { cx: sx, cy: sy, r: 1.9, fill: L }, g);
-      el('path', { d: `M${sx},${sy} Q${ex},${sy} ${ex},17`, fill: 'none', stroke: L, 'stroke-width': 2 }, g);
-      headDown(ex, 21);
-    });
-    // ── Funnel ──
-    el('path', { d: 'M3,25 L45,25 L28.5,47 L28.5,66 L19.5,70.5 L19.5,47 Z', ...o(M, 2.4) }, g);
-    el('ellipse', { cx: 24, cy: 25, rx: 21, ry: 3.6, ...o(Lt, 2) }, g);
+    // Proportions measured from slide 5: whole icon ≈ 1.54 : 1 (w : h);
+    // funnel rim overlaps the monitor's left edge.
+    const slate = '#56687e', screen = '#cfdeeb', funnel = '#6f9aa6';
 
-    // ── Monitor with dashboard ──
-    el('rect', { x: 50, y: 8, width: 47, height: 41, rx: 2.5, ...o(Wh, 2.6) }, g);
-    el('rect', { x: 53.5, y: 11.5, width: 40, height: 34, fill: Lt, stroke: L, 'stroke-width': 1.2 }, g);
-    ln(57, 16.5, 69, 16.5, 1.8); ln(57, 21, 65, 21, 1.4);
+    // ── Monitor (behind the funnel) ──
+    el('rect', { x: 41.1, y: 13.7, width: 58.9, height: 44.7, rx: 1.5, ...o(screen, 1.6) }, g);
+    el('path', { d: 'M41.1,50.7 L100,50.7 L100,56.9 Q100,58.4 98.5,58.4 L42.6,58.4 Q41.1,58.4 41.1,56.9 Z', ...o(slate, 1.6) }, g);
+    ln(69.9, 54.5, 72.4, 54.5, 1.2);
+    el('path', { d: 'M64.4,58.4 L77.7,58.4 L81.7,66.9 L60.4,66.9 Z', ...o(slate, 1.5) }, g);
+    ln(57.3, 67.3, 84.8, 67.3, 1.8);
+    // Heading lines
+    ln(47.6, 19.8, 59.8, 19.8, 1.3); ln(47.6, 22.8, 55.3, 22.8, 1.3);
     // Bar chart
-    [[57, 9], [62, 14], [67, 20], [72, 12]].forEach(([x, h]) =>
-      el('rect', { x, y: 42 - h, width: 3.8, height: h, ...o(M, 1.1) }, g));
-    ln(55.5, 42, 78, 42, 1.3);
-    // Pie chart
-    const qx = 86, qy = 21, qr = 6.2;
-    el('circle', { cx: qx, cy: qy, r: qr, ...o(Wh, 1.4) }, g);
-    el('path', { d: `M${qx},${qy} L${qx},${qy - qr} A${qr},${qr} 0 0 1 ${qx + qr * 0.95},${qy + qr * 0.3} Z`, ...o(M, 1.2) }, g);
-    el('path', { d: `M${qx},${qy} L${qx + qr * 0.95},${qy + qr * 0.3} A${qr},${qr} 0 0 1 ${qx + qr * 0.2},${qy + qr * 0.98} Z`, fill: L, stroke: L, 'stroke-width': 1 }, g);
-    ln(81, 33, 91, 33, 1.5); ln(81, 37, 89, 37, 1.5); ln(81, 41, 91, 41, 1.5);
-    // Stand
-    el('path', { d: 'M70,49 L77,49 L79.5,60 L67.5,60 Z', ...o(M, 2) }, g);
-    el('rect', { x: 62, y: 60, width: 23, height: 4.5, rx: 2, ...o(M, 2) }, g);
+    [[47.2, 38.5], [53.9, 31.4], [60.8, 35], [67.9, 26.9]].forEach(([x, top]) =>
+      el('rect', { x, y: top, width: 4.1, height: 46.2 - top, ...o(slate, 1.1) }, g));
+    ln(46.1, 46.2, 74, 46.2, 1.3);
+    // Pie chart: slate 3/4 with the top-right wedge pulled out
+    const qx = 86.2, qy = 26.3, qr = 7.7;
+    el('path', { d: `M${qx},${qy} L${qx + qr},${qy} A${qr},${qr} 0 1 1 ${qx},${qy - qr} Z`, ...o(slate, 1.2) }, g);
+    el('path', { d: `M${qx + 0.9},${qy - 0.9} L${qx + 0.9},${qy - qr - 0.9} A${qr},${qr} 0 0 1 ${qx + qr + 0.9},${qy - 0.9} Z`, ...o(slate, 1.2) }, g);
+    // Text lines
+    ln(78.1, 40.1, 94.9, 40.1, 1.3); ln(78.1, 43.1, 94.9, 43.1, 1.3); ln(78.1, 46.2, 89.9, 46.2, 1.3);
+    el('circle', { cx: 93, cy: 46.2, r: 0.8, fill: L }, g);
+
+    // ── Arrows into the funnel ──
+    el('line', { x1: 23.8, y1: 3.5, x2: 23.8, y2: 21.6, stroke: L, 'stroke-width': 1.3, 'stroke-dasharray': '2,1.8' }, g);
+    headDown(23.8, 24.4, 2.6);
+    // Inner pair: dot + curve + arrowhead
+    [[6.5, 16.3], [40.7, 30.5]].forEach(([sx, ex]) => {
+      el('circle', { cx: sx, cy: 6.3, r: 1.7, ...o(slate, 1.1) }, g);
+      el('path', { d: `M${sx},6.3 Q${ex},6.3 ${ex},18`, fill: 'none', stroke: L, 'stroke-width': 1.4 }, g);
+      headDown(ex, 21, 2.6);
+    });
+    // Outer pair: dot + curve ending at the rim
+    [[2.4, 10.2], [44.1, 37]].forEach(([sx, ex]) => {
+      el('circle', { cx: sx, cy: 14.1, r: 1.7, ...o(slate, 1.1) }, g);
+      el('path', { d: `M${sx},14.1 Q${ex},14.1 ${ex},27.3`, fill: 'none', stroke: L, 'stroke-width': 1.4 }, g);
+    });
+
+    // ── Funnel (in front of the monitor) ──
+    el('path', { d: 'M2.4,32 L44.1,32 L26.8,52.7 L26.8,62.9 L18.7,68.5 L18.7,52.7 Z', ...o(funnel, 1.6) }, g);
+    el('rect', { x: 0.4, y: 27.3, width: 45.7, height: 4.7, rx: 1.5, ...o(slate, 1.6) }, g);
   }
 
   return g;
@@ -745,7 +818,7 @@ function render() {
     }
 
     // Large two-tone stage icon in the lower half of the disc
-    drawStageIcon(svg, st.decorIcon, cx, cy + 60, 134);
+    drawStageIcon(svg, st.decorIcon, cx, cy + 56, 130);
   });
 
   // ── Items ── (vertical column directly above or below the stage circle)
