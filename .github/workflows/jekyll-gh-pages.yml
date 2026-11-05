@@ -30,6 +30,17 @@ jobs:
         uses: actions/checkout@v4
       - name: Setup Pages
         uses: actions/configure-pages@v5
+      # Choose which page is served at the site root.
+      # Set HOME_PAGE to 'index.html' to serve the original page again.
+      # When another page is chosen, the original stays reachable as index_original.html.
+      - name: Select home page
+        env:
+          HOME_PAGE: roadmap_verona.html
+        run: |
+          if [ "$HOME_PAGE" != "index.html" ]; then
+            cp index.html index_original.html
+            cp "$HOME_PAGE" index.html
+          fi
       - name: Build with Jekyll
         uses: actions/jekyll-build-pages@v1
         with:
