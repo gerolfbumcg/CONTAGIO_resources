@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CONTAGIO – 5-Stage Roadmap for Rapid Epidemic Response</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800;900&family=Roboto+Condensed:wght@400;700;800&family=Nunito+Sans:ital,wght@0,300;0,400;0,600;0,700;1,300&display=swap');
+
+  :root {
+    --bg: #e9f0f5;
+    --text: #1a2a3a;
+    --muted: #5a7a9a;
+    --header-bg: #1a3a5c;
+    --todo: #c79100;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  .diagram-wrap {
+    width: 100%;
+    overflow: auto;
+    padding: 1rem;
+  }
+
+  svg#diagram {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Link styling inside the SVG */
+  svg a { cursor: pointer; }
+  svg a text.card-title { transition: text-decoration 0.15s ease; }
+  svg a:hover text.card-title { text-decoration: underline; }
+  svg a:hover .card-hit { fill: rgba(26, 58, 92, 0.04); }
+
+  .legend {
+    text-align: center;
+    font-size: 0.78rem;
+    color: var(--muted);
+    padding: 0 1rem 1.5rem;
+    line-height: 1.5;
+  }
+  .legend .swatch {
+    display: inline-block;
+    width: 0.7rem;
+    height: 0.7rem;
+    border-radius: 3px;
+    vertical-align: -1px;
+    margin: 0 0.3rem 0 0.6rem;
+  }
+  .legend .swatch.todo { background: var(--todo); }
+</style>
+</head>
+<body>
+
+<div class="diagram-wrap">
+  <svg id="diagram" xmlns="http://www.w3.org/2000/svg"></svg>
+</div>
+
+<div class="legend">
+  <span class="swatch todo"></span> = link still to be added (edit <code>STAGES[…].items[…].url</code> in the source)
+</div>
+
+<script>
+/* ============================================================================
+   DATA — edit this array to change titles, descriptions, icons or add URLs.
+   Each item has:
+     title : short heading shown in bold
+     desc  : 1–3 line description
+     icon  : icon key (see ICONS in drawIcon below)
+     url   : absolute URL, or null/'' if the link is not yet known
+   ============================================================================ */
+
+const TITLE    = 'CONTAGIO: A 5-Stage Roadmap for Rapid Epidemic Response';
+const SUBTITLE = 'A modular workflow to transition research groups from \u2018inter-epidemic\u2019 quiet periods to active, coordinated outbreak response units, bridging the gap for immediate data and sample availability.';
+
+const STAGES = [
+  {
+    key: 'stage1',
+    number: 1,
+    label: 'COHORT PREPAREDNESS',
+    sublabel: '(WP1 & WP2)',
+    row: 'top',           // 'top' | 'bottom' — items sit in the opposite half
+    col: 0,               // horizontal slot 0..4
+    color: '#2d5f8a',
+    dark:  '#1a3a5c',
+    ring: '#1f3d66', ringDark: '#13294a',
+    decorIcon: 'cohort',  // big icon inside the stage circle
+    items: [
+      {
+        title: 'BUILD YOUR CONSORTIUM',
+        desc:  'Establish Global Research Connections via Cohort Preparedness Platform to connect capabilities.',
+        icon:  'network',
+        url:   'https://contagio.shinyapps.io/StarterDashboard/',
+      },
+      {
+        title: 'DATA DISCOVERY',
+        desc:  'Access the EMBL Pathogens Portal to leverage existing relevant data and samples.',
+        icon:  'database',
+        url:   'https://www.pathogensportal.org/',
+      },
+      {
+        title: 'PUBLIC HEALTH ALIGNMENT',
+        desc:  'Integrate with Regional Authorities using the \u2018Integration\u2019 tool to define priorities and coordination.',
+        icon:  'people',
+        url:   null,
+      },
+    ],
+  },
+  {
+    key: 'stage2',
+    number: 2,
+    label: 'RAPID DATA & SAMPLE COLLECTION',
+    sublabel: '(WP2 & WP4)',
+    row: 'bottom',
+    col: 1,
+    color: '#3aada0',
+    dark:  '#237a70',
+    ring: '#4f9e97', ringDark: '#357771',
+    decorIcon: 'tabletVial',
+    items: [
+      {
+        title: 'IMMEDIATE PATIENT DATA COLLECTION',
+        desc:  'Access Pre-built eCRF Extensions developed with ISARIC for harmonized data.',
+        icon:  'clipboard',
+        url:   'https://bridge.isaric.org/main',
+      },
+      {
+        title: 'UNIFORM SAMPLE COLLECTION TEMPLATES',
+        desc:  'Utilize pre-built templates for Standardized Specimen Storage across sites.',
+        icon:  'vial',
+        url:   null,
+      },
+      {
+        title: 'ETHICAL AND LEGAL FRAMEWORKS',
+        desc:  'Access Regulatory Compliance resources and templates for local legal requirements.',
+        icon:  'scales',
+        url:   null,
+      },
+      { 
+        title: 'Language Integration Network Kit (LINK)',
+        desc:  'Validate and edit automatic machine translations of e-CRFs (es, pt & fr).',
+        icon:  'link',
+        url:   'https://link-mgea.vercel.app/',
+      },
+      
+    ],
+  },
+  {
+    key: 'stage3',
+    number: 3,
+    label: 'ETHICS & GOVERNANCE',
+    sublabel: '(WP3)',
+    row: 'top',
+    col: 2,
+    color: '#5bb8c4',
+    dark:  '#358a96',
+    ring: '#4c9ca2', ringDark: '#33787f',
+    decorIcon: 'shieldCert',
+    items: [
+      {
+        title: 'ACCELERATED CONSENT PROCEDURES',
+        desc:  'Implement standardized Broad Consent Guidelines and templates.',
+        icon:  'dot',
+        url:   null,
+      },
+      {
+        title: 'STREAMLINED ETHICAL APPROVAL',
+        desc:  'Use established guidelines and templates for Ethics Committee Applications during emergencies.',
+        icon:  'dot',
+        url:   null,
+      },
+    ],
+  },
+  {
+    key: 'stage4',
+    number: 4,
+    label: 'DATA & SAMPLE MANAGEMENT',
+    sublabel: '(WP3\u2013WP4)',
+    row: 'bottom',
+    col: 3,
+    color: '#5a8fb8',
+    dark:  '#3a6080',
+    ring: '#3e70a0', ringDark: '#29527c',
+    decorIcon: 'cloudData',
+    items: [
+      {
+        title: 'TRANSPARENT DATA REQUEST REVIEWS',
+        desc:  'Follow Data Access Committee (DAC) Roadmap and use DTA templates.',
+        icon:  'cloud',
+        url:   null,
+      },
+      {
+        title: 'GLOBAL SPECIMEN CATALOGING',
+        desc:  'Use the Virtual Biorepository System (VBS) for global governance framework cataloging.',
+        icon:  'brain',
+        url:   null,
+      },
+      {
+        title: 'FACILITATED SAMPLE SHARING POLICIES',
+        desc:  'Apply 10x10 Sharing Project policies for flow of physical materials.',
+        icon:  'share',
+        url:   null,
+      },
+    ],
+  },
+  {
+    key: 'stage5',
+    number: 5,
+    label: 'INTEGRATION & ANALYSIS',
+    sublabel: '',
+    row: 'top',
+    col: 4,
+    color: '#4a6580',
+    dark:  '#2d4560',
+    ring: '#5b6571', ringDark: '#3d454f',
+    decorIcon: 'funnelChart',
+    items: [
+      {
+        title: 'PATHOGENS PORTAL INTEGRATION',
+        desc:  'Flow multimodal data through Interoperable Data Pipeline standards for immediate use, using established interoperability standards.',
+        icon:  'dot',
+        url:   null,
+      },
+      {
+        title: 'HIGH-QUALITY RESEARCH STANDARDS',
+        desc:  'Address measurement errors using EID Measurement Guidance to ensure data integrity.',
+        icon:  'dot',
+        url:   null,
+      },
+    ],
+  },
+];
+
+/* ============================================================================
+   LAYOUT — change these if you want to nudge positions
+   ============================================================================ */
+
+const LAYOUT = {
+  W: 1750,
+  H: 1100,
+  headerH: 95,
+  subtitleY: 130,
+  subtitleMaxChars: 110,
+
+  // Stage circles
+  bubbleR:  150,
+  topRowY:  340,        // y-centre of top-row circles
+  bottomRowY: 850,      // y-centre of bottom-row circles
+  colX: [180, 540, 880, 1220, 1555], // x-centre for each of the 5 columns
+
+  // Items — vertical column, same x as the circle, opposite half of canvas
+  cardW: 200,
+  cardH: 100,
+  cardGapY: 18,
+  itemsTopY: 240, //195,       // y where items start for BOTTOM-row stages (items go above circle)
+  itemsBottomY: 530,    // y where items start for TOP-row stages (items go below circle)
+};
+
+/* ============================================================================
+   SVG HELPERS
+   ============================================================================ */
+
+const NS = 'http://www.w3.org/2000/svg';
+function el(tag, attrs, parent) {
+  const e = document.createElementNS(NS, tag);
+  if (attrs) for (const [k, v] of Object.entries(attrs)) {
+    if (v === null || v === undefined) continue;
+    e.setAttribute(k, String(v));
+  }
+  if (parent) parent.appendChild(e);
+  return e;
+}
+
+function lighten(hex, amt) {
+  const n = parseInt(hex.replace('#', ''), 16);
+  return `rgb(${Math.min(255, (n >> 16) + amt)},${Math.min(255, ((n >> 8) & 0xff) + amt)},${Math.min(255, (n & 0xff) + amt)})`;
+}
+
+function wrapLines(text, maxChars) {
+  const words = text.split(' ');
+  const lines = [];
+  let cur = '';
+  for (const w of words) {
+    const test = cur ? cur + ' ' + w : w;
+    if (test.length > maxChars && cur) { lines.push(cur); cur = w; }
+    else cur = test;
+  }
+  if (cur) lines.push(cur);
+  return lines;
+}
+
+/* ============================================================================
+   ICON LIBRARY — minimal flat icons matching the source infographic
+   All icons are drawn inside a sz×sz box centred at (cx, cy), using `col`.
+   ============================================================================ */
+
+function drawIcon(parent, type, cx, cy, sz, col) {
+  const g = el('g', { transform: `translate(${cx - sz / 2},${cy - sz / 2})` }, parent);
+  const s = sz, sw = Math.max(1.4, s * 0.08);
+  const base = { stroke: col, 'stroke-width': sw, fill: 'none',
+                 'stroke-linecap': 'round', 'stroke-linejoin': 'round' };
+
+  if (type === 'clipboard') {
+    el('rect', { ...base, x: s * 0.16, y: s * 0.18, width: s * 0.68, height: s * 0.74, rx: s * 0.06 }, g);
+    el('rect', { ...base, x: s * 0.34, y: s * 0.08, width: s * 0.32, height: s * 0.18, rx: s * 0.04 }, g);
+    el('line', { ...base, x1: s * 0.28, y1: s * 0.4,  x2: s * 0.72, y2: s * 0.4  }, g);
+    el('line', { ...base, x1: s * 0.28, y1: s * 0.54, x2: s * 0.72, y2: s * 0.54 }, g);
+    el('line', { ...base, x1: s * 0.28, y1: s * 0.68, x2: s * 0.6,  y2: s * 0.68 }, g);
+
+  } else if (type === 'vial') {
+    // Tube
+    el('path', { ...base, d:
+      `M${s * 0.36},${s * 0.1} L${s * 0.36},${s * 0.74}
+       a${s * 0.14},${s * 0.14} 0 0 0 ${s * 0.28},0
+       L${s * 0.64},${s * 0.1} Z` }, g);
+    el('line', { ...base, x1: s * 0.3, y1: s * 0.1, x2: s * 0.7, y2: s * 0.1 }, g);
+    // Liquid fill
+    el('path', {
+      d: `M${s * 0.36},${s * 0.5} L${s * 0.36},${s * 0.74}
+          a${s * 0.14},${s * 0.14} 0 0 0 ${s * 0.28},0
+          L${s * 0.64},${s * 0.5} Z`,
+      fill: col, opacity: 0.35
+    }, g);
+
+  } else if (type === 'scales') {
+    el('line', { ...base, x1: s * 0.5,  y1: s * 0.16, x2: s * 0.5,  y2: s * 0.88 }, g);
+    el('line', { ...base, x1: s * 0.16, y1: s * 0.28, x2: s * 0.84, y2: s * 0.28 }, g);
+    el('circle', { ...base, cx: s * 0.5, cy: s * 0.14, r: s * 0.04, fill: col }, g);
+    // Left pan
+    el('path', { ...base, d: `M${s * 0.1},${s * 0.46} L${s * 0.34},${s * 0.46} L${s * 0.22},${s * 0.62} Z` }, g);
+    el('line', { ...base, x1: s * 0.22, y1: s * 0.28, x2: s * 0.22, y2: s * 0.46 }, g);
+    // Right pan
+    el('path', { ...base, d: `M${s * 0.66},${s * 0.46} L${s * 0.9},${s * 0.46} L${s * 0.78},${s * 0.62} Z` }, g);
+    el('line', { ...base, x1: s * 0.78, y1: s * 0.28, x2: s * 0.78, y2: s * 0.46 }, g);
+    // Base
+    el('line', { ...base, x1: s * 0.34, y1: s * 0.88, x2: s * 0.66, y2: s * 0.88 }, g);
+
+  } else if (type === 'network') {
+    // Central globe with surrounding nodes
+    el('circle', { ...base, cx: s * 0.5, cy: s * 0.5, r: s * 0.18 }, g);
+    el('path', { ...base, d: `M${s * 0.32},${s * 0.5} Q${s * 0.5},${s * 0.34} ${s * 0.68},${s * 0.5}` }, g);
+    el('path', { ...base, d: `M${s * 0.32},${s * 0.5} Q${s * 0.5},${s * 0.66} ${s * 0.68},${s * 0.5}` }, g);
+    el('line', { ...base, x1: s * 0.5, y1: s * 0.32, x2: s * 0.5, y2: s * 0.68 }, g);
+    // Surrounding nodes
+    ['0.2,0.2', '0.8,0.2', '0.2,0.8', '0.8,0.8'].forEach(p => {
+      const [px, py] = p.split(',').map(Number);
+      el('circle', { cx: s * px, cy: s * py, r: s * 0.07, fill: col }, g);
+    });
+    el('line', { ...base, x1: s * 0.26, y1: s * 0.26, x2: s * 0.4,  y2: s * 0.4  }, g);
+    el('line', { ...base, x1: s * 0.74, y1: s * 0.26, x2: s * 0.6,  y2: s * 0.4  }, g);
+    el('line', { ...base, x1: s * 0.26, y1: s * 0.74, x2: s * 0.4,  y2: s * 0.6  }, g);
+    el('line', { ...base, x1: s * 0.74, y1: s * 0.74, x2: s * 0.6,  y2: s * 0.6  }, g);
+
+  } else if (type === 'database') {
+    // 3 stacked discs
+    const r = s * 0.3, h = s * 0.08;
+    [0.28, 0.5, 0.72].forEach(y => {
+      el('ellipse', { ...base, cx: s * 0.5, cy: s * y, rx: r, ry: h, fill: 'white' }, g);
+    });
+    el('line', { ...base, x1: s * 0.2, y1: s * 0.28, x2: s * 0.2, y2: s * 0.72 }, g);
+    el('line', { ...base, x1: s * 0.8, y1: s * 0.28, x2: s * 0.8, y2: s * 0.72 }, g);
+
+  } else if (type === 'people') {
+    // 3 heads + shoulders cluster
+    el('circle', { cx: s * 0.5,  cy: s * 0.3, r: s * 0.11, fill: col }, g);
+    el('circle', { cx: s * 0.24, cy: s * 0.4, r: s * 0.09, fill: col }, g);
+    el('circle', { cx: s * 0.76, cy: s * 0.4, r: s * 0.09, fill: col }, g);
+    el('path', { ...base, d: `M${s * 0.32},${s * 0.78} C${s * 0.32},${s * 0.56} ${s * 0.68},${s * 0.56} ${s * 0.68},${s * 0.78}` }, g);
+    el('path', { ...base, d: `M${s * 0.08},${s * 0.84} C${s * 0.08},${s * 0.62} ${s * 0.32},${s * 0.62} ${s * 0.32},${s * 0.78}` }, g);
+    el('path', { ...base, d: `M${s * 0.92},${s * 0.84} C${s * 0.92},${s * 0.62} ${s * 0.68},${s * 0.62} ${s * 0.68},${s * 0.78}` }, g);
+
+  } else if (type === 'cloud') {
+    el('path', { ...base, d:
+      `M${s * 0.22},${s * 0.7}
+       a${s * 0.18},${s * 0.18} 0 0 1 ${s * 0.04},-${s * 0.32}
+       a${s * 0.22},${s * 0.22} 0 0 1 ${s * 0.42},-${s * 0.06}
+       a${s * 0.16},${s * 0.16} 0 0 1 ${s * 0.22},${s * 0.18}
+       a${s * 0.14},${s * 0.14} 0 0 1 -${s * 0.04},${s * 0.28} Z` }, g);
+    el('line', { ...base, x1: s * 0.36, y1: s * 0.56, x2: s * 0.62, y2: s * 0.56 }, g);
+    el('line', { ...base, x1: s * 0.36, y1: s * 0.66, x2: s * 0.56, y2: s * 0.66 }, g);
+
+  } else if (type === 'brain') {
+    // Stylised brain / neural network
+    el('path', { ...base, d:
+      `M${s * 0.5},${s * 0.18}
+       C${s * 0.28},${s * 0.18} ${s * 0.16},${s * 0.42} ${s * 0.24},${s * 0.58}
+       C${s * 0.18},${s * 0.7} ${s * 0.28},${s * 0.84} ${s * 0.42},${s * 0.82}
+       C${s * 0.46},${s * 0.9} ${s * 0.54},${s * 0.9} ${s * 0.58},${s * 0.82}
+       C${s * 0.72},${s * 0.84} ${s * 0.82},${s * 0.7} ${s * 0.76},${s * 0.58}
+       C${s * 0.84},${s * 0.42} ${s * 0.72},${s * 0.18} ${s * 0.5},${s * 0.18} Z` }, g);
+    el('line', { ...base, x1: s * 0.5, y1: s * 0.18, x2: s * 0.5, y2: s * 0.86 }, g);
+    el('circle', { cx: s * 0.35, cy: s * 0.4, r: s * 0.04, fill: col }, g);
+    el('circle', { cx: s * 0.65, cy: s * 0.5, r: s * 0.04, fill: col }, g);
+    el('circle', { cx: s * 0.4,  cy: s * 0.66, r: s * 0.04, fill: col }, g);
+
+  } else if (type === 'share') {
+    el('circle', { ...base, cx: s * 0.5,  cy: s * 0.22, r: s * 0.13, fill: 'white' }, g);
+    el('circle', { ...base, cx: s * 0.18, cy: s * 0.72, r: s * 0.13, fill: 'white' }, g);
+    el('circle', { ...base, cx: s * 0.82, cy: s * 0.72, r: s * 0.13, fill: 'white' }, g);
+    el('line', { ...base, x1: s * 0.42, y1: s * 0.32, x2: s * 0.26, y2: s * 0.62 }, g);
+    el('line', { ...base, x1: s * 0.58, y1: s * 0.32, x2: s * 0.74, y2: s * 0.62 }, g);
+
+  } else if (type === 'dot') {
+    el('circle', { cx: s * 0.5, cy: s * 0.5, r: s * 0.18, fill: col }, g);
+  }  else if (type === 'link') {
+    // Chain-link icon (Lucide-style hyperlink): two interlocking C-shapes
+    // on a diagonal, like two chain links joined together.
+    el('path', { ...base, d:
+      `M${s * 0.4167},${s * 0.5417}
+      a${s * 0.2083},${s * 0.2083} 0 0 0 ${s * 0.3142},${s * 0.0225}
+      l${s * 0.125},${-s * 0.125}
+      a${s * 0.2083},${s * 0.2083} 0 0 0 ${-s * 0.2946},${-s * 0.2946}
+      l${-s * 0.0717},${s * 0.0713}` }, g);
+    el('path', { ...base, d:
+      `M${s * 0.5833},${s * 0.4583}
+      a${s * 0.2083},${s * 0.2083} 0 0 0 ${-s * 0.3142},${-s * 0.0225}
+      l${-s * 0.125},${s * 0.125}
+      a${s * 0.2083},${s * 0.2083} 0 0 0 ${s * 0.2946},${s * 0.2946}
+      l${s * 0.0713},${-s * 0.0713}` }, g);
+  }
+
+  return g;
+}
+
+/* ============================================================================
+   STAGE ICONS — large two-tone flat icons inside the stage circles,
+   modelled after slide 5 (dark navy outlines, mid/light blue fills).
+   Drawn in a 100×72 design box, scaled to width `w`, centred at (cx, cy).
+   ============================================================================ */
+
+const SI = { line: '#24384f', mid: '#5f87b0', light: '#c4d6e8', white: '#ffffff' };
+
+function drawStageIcon(parent, type, cx, cy, w) {
+  const k = w / 100;
+  const g = el('g', {
+    transform: `translate(${cx - 50 * k},${cy - 36 * k}) scale(${k})`,
+    'stroke-linecap': 'round', 'stroke-linejoin': 'round'
+  }, parent);
+  const L = SI.line, M = SI.mid, Lt = SI.light, Wh = SI.white;
+  const SW = 2.4;
+  const o = (fill, sw = SW) => ({ fill, stroke: L, 'stroke-width': sw });
+  const ln = (x1, y1, x2, y2, sw = 1.6) =>
+    el('line', { x1, y1, x2, y2, stroke: L, 'stroke-width': sw }, g);
+  // Closed smooth blob through points generated around (bx,by)
+  const blob = (bx, by, r, radii, fill = M, sw = 1.3) => {
+    const n = radii.length;
+    const pts = radii.map((f, i) => {
+      const a = (i / n) * Math.PI * 2;
+      return [bx + Math.cos(a) * r * f, by + Math.sin(a) * r * f];
+    });
+    const mid = (p, q) => [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2];
+    let d = `M${mid(pts[n - 1], pts[0]).join(',')}`;
+    for (let i = 0; i < n; i++) {
+      const p = pts[i], m = mid(p, pts[(i + 1) % n]);
+      d += ` Q${p[0]},${p[1]} ${m[0]},${m[1]}`;
+    }
+    el('path', { d: d + ' Z', ...o(fill, sw) }, g);
+  };
+  const headDown = (x, y, sz = 3.6) =>
+    el('path', { d: `M${x - sz},${y - sz * 1.2} L${x},${y} L${x + sz},${y - sz * 1.2} Z`,
+      fill: L, stroke: L, 'stroke-width': 1 }, g);
+
+  if (type === 'cohort') {
+    // ── Globe in the centre ──
+    const gx = 50, gy = 38, gr = 11;
+    el('circle', { cx: gx, cy: gy, r: gr, ...o(M) }, g);
+    el('ellipse', { cx: gx, cy: gy, rx: 4.8, ry: gr, fill: 'none', stroke: L, 'stroke-width': 1.5 }, g);
+    ln(gx - gr, gy, gx + gr, gy, 1.5);
+    ln(gx, gy - gr, gx, gy + gr, 1.5);
+    el('path', { d: `M${gx - 9.5},${gy - 5.5} Q${gx},${gy - 3} ${gx + 9.5},${gy - 5.5}`, fill: 'none', stroke: L, 'stroke-width': 1.3 }, g);
+    el('path', { d: `M${gx - 9.5},${gy + 5.5} Q${gx},${gy + 3} ${gx + 9.5},${gy + 5.5}`, fill: 'none', stroke: L, 'stroke-width': 1.3 }, g);
+
+    // ── Rotation arrows on an orbit between the badges ──
+    const R = 26;
+    const P = a => [gx + R * Math.cos(a * Math.PI / 180), gy + R * Math.sin(a * Math.PI / 180)];
+    [[-60, 2], [60, 122], [180, 242]].forEach(([a1, a2]) => {
+      const [x1, y1] = P(a1), [x2, y2] = P(a2);
+      el('path', { d: `M${x1},${y1} A${R},${R} 0 0 1 ${x2},${y2}`, fill: 'none', stroke: L, 'stroke-width': 2 }, g);
+      // Arrowhead pointing along the clockwise tangent
+      const t = a2 * Math.PI / 180, tx = -Math.sin(t), ty = Math.cos(t);
+      const nx = Math.cos(t), ny = Math.sin(t), h = 4.2;
+      el('path', { d: `M${x2 + tx * h},${y2 + ty * h}
+        L${x2 - tx * h * 0.4 + nx * h * 0.9},${y2 - ty * h * 0.4 + ny * h * 0.9}
+        L${x2 - tx * h * 0.4 - nx * h * 0.9},${y2 - ty * h * 0.4 - ny * h * 0.9} Z`,
+        fill: L, stroke: L, 'stroke-width': 1 }, g);
+    });
+
+    // ── Three person badges (top, bottom-left, bottom-right) ──
+    [-90, 30, 150].forEach(a => {
+      const [bx, by] = P(a);
+      const br = 10.5;
+      el('circle', { cx: bx, cy: by, r: br, ...o(Lt) }, g);
+      el('path', { d: `M${bx - 6.8},${by + 7.8} Q${bx - 6.8},${by + 1.6} ${bx},${by + 1.6}
+                       Q${bx + 6.8},${by + 1.6} ${bx + 6.8},${by + 7.8}`, ...o(M, 1.5) }, g);
+      el('circle', { cx: bx, cy: by - 3, r: 3.7, ...o(M, 1.5) }, g);
+    });
+
+  } else if (type === 'tabletVial') {
+    // ── Tablet ──
+    el('rect', { x: 16, y: 1, width: 40, height: 70, rx: 5, ...o(M, 2.6) }, g);
+    el('rect', { x: 20.5, y: 6, width: 31, height: 55, rx: 1.5, ...o(Wh, 1.5) }, g);
+    el('circle', { cx: 36, cy: 66, r: 2.2, ...o(Wh, 1.4) }, g);
+    // Screen content: image box, heading lines, text lines, line chart
+    el('rect', { x: 24, y: 10, width: 10, height: 9, ...o(M, 1.3) }, g);
+    ln(37, 12, 48, 12); ln(37, 16.5, 46, 16.5);
+    ln(24, 25, 48, 25); ln(24, 30, 48, 30); ln(24, 35, 44, 35); ln(24, 40, 48, 40);
+    el('polyline', { points: '24,56 29,51 33,54 38,46 42,51 48,48', fill: 'none', stroke: L, 'stroke-width': 1.6 }, g);
+    ln(24, 58, 48, 58, 1.2);
+
+    // ── Test tube in a rack ──
+    // Tube body + liquid
+    el('path', { d: 'M66,11 L66,56 a5,5 0 0 0 10,0 L76,11 Z', ...o(Wh) }, g);
+    el('path', { d: 'M66,33 L66,56 a5,5 0 0 0 10,0 L76,33 Z', fill: M, stroke: L, 'stroke-width': 1.4 }, g);
+    // Ribbed cap
+    el('rect', { x: 63.5, y: 2, width: 15, height: 9.5, rx: 1.5, ...o(M) }, g);
+    [66.5, 69.5, 72.5, 75.5].forEach(x => ln(x, 3.5, x, 10, 1.2));
+    // Rack: crossbar, legs, base
+    el('rect', { x: 59, y: 38, width: 24, height: 5, rx: 1, ...o(M, 2) }, g);
+    el('rect', { x: 60, y: 43, width: 4.5, height: 23, ...o(M, 2) }, g);
+    el('rect', { x: 77.5, y: 43, width: 4.5, height: 23, ...o(M, 2) }, g);
+    el('rect', { x: 57, y: 65.5, width: 28, height: 5, rx: 1, ...o(M, 2) }, g);
+    // Re-draw tube front over the crossbar so it reads as "through" the rack
+    el('rect', { x: 66, y: 38, width: 10, height: 5, fill: M, stroke: 'none' }, g);
+    ln(66, 38, 66, 43, 2.4); ln(76, 38, 76, 43, 2.4);
+
+  } else if (type === 'shieldCert') {
+    // ── Shield with check mark ──
+    el('path', { d: 'M28,3 L47,9.5 L47,34 Q47,58 28,70 Q9,58 9,34 L9,9.5 Z', ...o(M, 2.6) }, g);
+    el('path', { d: 'M28,9.5 L41.5,14 L41.5,34 Q41.5,53 28,63 Q14.5,53 14.5,34 L14.5,14 Z', ...o(Lt, 1.5) }, g);
+    el('path', { d: 'M19.5,36 L26,43.5 L37.5,27', fill: 'none', stroke: L, 'stroke-width': 5 }, g);
+
+    // ── Certificate with dog-ear ──
+    el('path', { d: 'M54,5 L80,5 L91,16 L91,69 L54,69 Z', ...o(Wh) }, g);
+    el('path', { d: 'M80,5 L80,16 L91,16 Z', ...o(Lt, 1.8) }, g);
+    ln(59, 13, 75, 13, 2); ln(59, 23, 86, 23); ln(59, 30, 86, 30);
+    ln(59, 37, 86, 37); ln(59, 44, 78, 44); ln(59, 60, 70, 60, 1.4);
+
+    // ── Rosette seal with ribbon tails ──
+    const sx = 81, sy = 55;
+    el('path', { d: `M${sx - 5},${sy + 4} L${sx - 8},${sy + 16} L${sx - 4},${sy + 13.5} L${sx - 1.5},${sy + 17} L${sx},${sy + 5} Z`, ...o(M, 1.3) }, g);
+    el('path', { d: `M${sx + 5},${sy + 4} L${sx + 8},${sy + 16} L${sx + 4},${sy + 13.5} L${sx + 1.5},${sy + 17} L${sx},${sy + 5} Z`, ...o(M, 1.3) }, g);
+    const pts = [];
+    for (let i = 0; i < 24; i++) {
+      const a = (i / 24) * Math.PI * 2, r = i % 2 ? 7 : 8.4;
+      pts.push(`${sx + Math.cos(a) * r},${sy + Math.sin(a) * r}`);
+    }
+    el('polygon', { points: pts.join(' '), ...o(M, 1.4) }, g);
+    el('circle', { cx: sx, cy: sy, r: 4.2, fill: Lt, stroke: L, 'stroke-width': 1.2 }, g);
+
+  } else if (type === 'cloudData') {
+    // ── Cloud ──
+    el('path', { d: 'M11,31 a8,8 0 0 1 1.5,-15.8 a11.5,11.5 0 0 1 21,-5.5 a9.5,9.5 0 0 1 15.5,6 a7.7,7.7 0 0 1 -1,15.3 Z', ...o(Lt) }, g);
+    // ── Database in front of the cloud ──
+    el('path', { d: 'M19,17 L19,36 a9,3.2 0 0 0 18,0 L37,17 Z', ...o(M) }, g);
+    el('path', { d: 'M19,23.3 a9,3.2 0 0 0 18,0', fill: 'none', stroke: L, 'stroke-width': 1.5 }, g);
+    el('path', { d: 'M19,29.6 a9,3.2 0 0 0 18,0', fill: 'none', stroke: L, 'stroke-width': 1.5 }, g);
+    el('ellipse', { cx: 28, cy: 17, rx: 9, ry: 3.2, ...o(Lt, 2) }, g);
+    // ── Org tree below ──
+    ln(28, 39.5, 28, 46, 2); ln(12.5, 46, 43.5, 46, 2);
+    [12.5, 28, 43.5].forEach(x => {
+      ln(x, 46, x, 51, 2);
+      el('rect', { x: x - 5, y: 51, width: 10, height: 9, rx: 1, ...o(M, 1.8) }, g);
+    });
+
+    // ── Petri dish with microbes ──
+    const px = 75, py = 40;
+    el('circle', { cx: px, cy: py, r: 23.5, ...o(Wh, 3.4) }, g);
+    el('circle', { cx: px, cy: py, r: 19, fill: Lt, stroke: L, 'stroke-width': 1.4 }, g);
+    blob(px - 6, py - 7, 6.5, [1, 0.8, 1.1, 0.75, 1.05, 0.85, 1.15, 0.8]);
+    blob(px + 5, py + 7.5, 5.5, [1, 0.85, 1.1, 0.9, 0.8, 1.1, 0.95]);
+    el('ellipse', { cx: px + 8, cy: py - 8, rx: 5, ry: 2.6, transform: `rotate(-35 ${px + 8} ${py - 8})`, ...o(M, 1.3) }, g);
+    el('circle', { cx: px - 9, cy: py + 7, r: 2.6, ...o(M, 1.2) }, g);
+    el('circle', { cx: px + 12, cy: py + 2, r: 1.8, ...o(M, 1.1) }, g);
+    el('circle', { cx: px - 1, cy: py + 1, r: 1.5, fill: L }, g);
+    el('circle', { cx: px - 3, cy: py + 13, r: 1.3, fill: L }, g);
+
+  } else if (type === 'funnelChart') {
+    // ── Five arrows flowing into the funnel ──
+    el('line', { x1: 24, y1: 2, x2: 24, y2: 17, stroke: L, 'stroke-width': 2, 'stroke-dasharray': '2.5,2.5' }, g);
+    headDown(24, 21);
+    [[5, 8, 12], [14.5, 2, 18], [33.5, 2, 30], [43, 8, 36]].forEach(([sx, sy, ex]) => {
+      el('circle', { cx: sx, cy: sy, r: 1.9, fill: L }, g);
+      el('path', { d: `M${sx},${sy} Q${ex},${sy} ${ex},17`, fill: 'none', stroke: L, 'stroke-width': 2 }, g);
+      headDown(ex, 21);
+    });
+    // ── Funnel ──
+    el('path', { d: 'M3,25 L45,25 L28.5,47 L28.5,66 L19.5,70.5 L19.5,47 Z', ...o(M, 2.4) }, g);
+    el('ellipse', { cx: 24, cy: 25, rx: 21, ry: 3.6, ...o(Lt, 2) }, g);
+
+    // ── Monitor with dashboard ──
+    el('rect', { x: 50, y: 8, width: 47, height: 41, rx: 2.5, ...o(Wh, 2.6) }, g);
+    el('rect', { x: 53.5, y: 11.5, width: 40, height: 34, fill: Lt, stroke: L, 'stroke-width': 1.2 }, g);
+    ln(57, 16.5, 69, 16.5, 1.8); ln(57, 21, 65, 21, 1.4);
+    // Bar chart
+    [[57, 9], [62, 14], [67, 20], [72, 12]].forEach(([x, h]) =>
+      el('rect', { x, y: 42 - h, width: 3.8, height: h, ...o(M, 1.1) }, g));
+    ln(55.5, 42, 78, 42, 1.3);
+    // Pie chart
+    const qx = 86, qy = 21, qr = 6.2;
+    el('circle', { cx: qx, cy: qy, r: qr, ...o(Wh, 1.4) }, g);
+    el('path', { d: `M${qx},${qy} L${qx},${qy - qr} A${qr},${qr} 0 0 1 ${qx + qr * 0.95},${qy + qr * 0.3} Z`, ...o(M, 1.2) }, g);
+    el('path', { d: `M${qx},${qy} L${qx + qr * 0.95},${qy + qr * 0.3} A${qr},${qr} 0 0 1 ${qx + qr * 0.2},${qy + qr * 0.98} Z`, fill: L, stroke: L, 'stroke-width': 1 }, g);
+    ln(81, 33, 91, 33, 1.5); ln(81, 37, 89, 37, 1.5); ln(81, 41, 91, 41, 1.5);
+    // Stand
+    el('path', { d: 'M70,49 L77,49 L79.5,60 L67.5,60 Z', ...o(M, 2) }, g);
+    el('rect', { x: 62, y: 60, width: 23, height: 4.5, rx: 2, ...o(M, 2) }, g);
+  }
+
+  return g;
+}
+
+/* ============================================================================
+   RENDER
+   ============================================================================ */
+
+function render() {
+  const svg = document.getElementById('diagram');
+  const { W, H, headerH, subtitleY, subtitleMaxChars,
+          bubbleR, topRowY, bottomRowY, colX,
+          cardW, cardH, cardGapY, itemsTopY, itemsBottomY } = LAYOUT;
+
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.setAttribute('width', W);
+  svg.setAttribute('height', H);
+
+  // ── Defs ──
+  const defs = el('defs', {}, svg);
+
+  // Drop shadow for circles
+  const fSh = el('filter', { id: 'sh', x: '-30%', y: '-30%', width: '160%', height: '160%' }, defs);
+  el('feDropShadow', { dx: 0, dy: 4, stdDeviation: 8, 'flood-color': 'rgba(0,0,0,0.22)' }, fSh);
+
+  // Soft shadow for icon backgrounds
+  const fSm = el('filter', { id: 'shSm', x: '-25%', y: '-25%', width: '150%', height: '150%' }, defs);
+  el('feDropShadow', { dx: 0, dy: 2, stdDeviation: 3, 'flood-color': 'rgba(0,0,0,0.12)' }, fSm);
+
+  // Ring drop shadow (offset down-left, like the slide)
+  const fRing = el('filter', { id: 'shRing', x: '-30%', y: '-30%', width: '160%', height: '160%' }, defs);
+  el('feDropShadow', { dx: -3, dy: 6, stdDeviation: 9, 'flood-color': 'rgba(0,0,0,0.30)' }, fRing);
+  // Soft blur used for the inner-edge shadow of the white disc
+  const fBlur = el('filter', { id: 'blurIn', x: '-10%', y: '-10%', width: '120%', height: '120%' }, defs);
+  el('feGaussianBlur', { stdDeviation: 2.2 }, fBlur);
+
+  // Radial "tube" gradients for each thick stage ring
+  // (inner edge lighter, outer edge darker; white disc covers 0–82%)
+  STAGES.forEach((st, i) => {
+    const g = el('radialGradient', { id: `sg${i}`, cx: '50%', cy: '50%', r: '50%' }, defs);
+    el('stop', { offset: '80%',  'stop-color': lighten(st.ring, 38) }, g);
+    el('stop', { offset: '86%',  'stop-color': lighten(st.ring, 18) }, g);
+    el('stop', { offset: '94%',  'stop-color': st.ring }, g);
+    el('stop', { offset: '100%', 'stop-color': st.ringDark }, g);
+  });
+
+  // Subtle dotted background pattern (matches the faint geometric texture in the source)
+  const pat = el('pattern', { id: 'bgdots', width: 40, height: 40, patternUnits: 'userSpaceOnUse' }, defs);
+  el('circle', { cx: 1, cy: 1, r: 1, fill: 'rgba(26,58,92,0.05)' }, pat);
+
+  // ── Background ──
+  el('rect', { x: 0, y: 0, width: W, height: H, fill: '#e9f0f5' }, svg);
+  el('rect', { x: 0, y: headerH, width: W, height: H - headerH, fill: 'url(#bgdots)' }, svg);
+
+  // ── Header band ──
+  el('rect', { x: 0, y: 0, width: W, height: headerH, fill: 'var(--header-bg, #1a3a5c)' }, svg);
+  // Split title into a CONTAGIO accent + rest
+  const headerY = headerH * 0.62;
+  const titleParts = TITLE.split(':');
+  const accent = titleParts[0] + ':';
+  const rest = titleParts.slice(1).join(':');
+  // Measure approx widths to centre nicely
+  const fontFamily = 'Nunito, sans-serif';
+  // Accent
+  const accentText = el('text', {
+    x: W / 2, y: headerY,
+    'font-family': fontFamily, 'font-size': 42, 'font-weight': 900,
+    fill: 'white', 'text-anchor': 'middle', 'letter-spacing': 0.5
+  }, svg);
+  const accentTspan = el('tspan', { fill: '#cfe2f3' }, accentText);
+  accentTspan.textContent = accent + ' ';
+  const restTspan = el('tspan', { fill: 'white', 'font-weight': 700 }, accentText);
+  restTspan.textContent = rest.trim();
+
+  // ── Subtitle ──
+  wrapLines(SUBTITLE, subtitleMaxChars).forEach((line, li) => {
+    el('text', {
+      x: W / 2, y: subtitleY + li * 22,
+      'font-family': fontFamily, 'font-size': 25, 'font-weight': 400,
+      fill: '#2a3e54', 'text-anchor': 'middle'
+    }, svg).textContent = line;
+  });
+
+  // ── Stage circles ──
+  STAGES.forEach((st, i) => {
+    const cx = colX[st.col];
+    const cy = st.row === 'top' ? topRowY : bottomRowY;
+
+    const ringW  = 27;                 // thick ring, ~18% of radius (slide 5)
+    const innerR = bubbleR - ringW;
+    const circFont = "'Roboto Condensed', 'Arial Narrow', sans-serif";
+    const circText = '#1b2838';
+
+    // Thick shaded ring with drop shadow
+    el('circle', { cx, cy, r: bubbleR, fill: `url(#sg${i})`, filter: 'url(#shRing)' }, svg);
+    // Inner-edge shadow + white disc
+    el('circle', { cx, cy, r: innerR + 0.5, fill: 'none',
+      stroke: 'rgba(0,0,0,0.28)', 'stroke-width': 4, filter: 'url(#blurIn)' }, svg);
+    el('circle', { cx, cy, r: innerR, fill: '#fcfdfd',
+      stroke: 'rgba(0,0,0,0.10)', 'stroke-width': 1 }, svg);
+
+    // "STAGE N:"
+    el('text', {
+      x: cx, y: cy - 76,
+      'font-family': circFont, 'font-size': 22, 'font-weight': 700,
+      fill: circText, 'text-anchor': 'middle'
+    }, svg).textContent = `STAGE ${st.number}:`;
+
+    // Stage label (bold condensed uppercase, max 2 lines)
+    const labelLines = wrapLines(st.label, 19).slice(0, 2);
+    const labelStartY = cy - 51;
+    labelLines.forEach((line, li) => {
+      el('text', {
+        x: cx, y: labelStartY + li * 23,
+        'font-family': circFont, 'font-size': 19.5, 'font-weight': 700,
+        fill: circText, 'text-anchor': 'middle'
+      }, svg).textContent = line;
+    });
+
+    // Sublabel (WP info), regular weight
+    if (st.sublabel) {
+      el('text', {
+        x: cx, y: labelStartY + labelLines.length * 23,
+        'font-family': circFont, 'font-size': 19, 'font-weight': 400,
+        fill: circText, 'text-anchor': 'middle'
+      }, svg).textContent = st.sublabel;
+    }
+
+    // Large two-tone stage icon in the lower half of the disc
+    drawStageIcon(svg, st.decorIcon, cx, cy + 60, 134);
+  });
+
+  // ── Items ── (vertical column directly above or below the stage circle)
+  STAGES.forEach((st) => {
+    const cx = colX[st.col];
+    const cardXoffset = -40;
+    // Items always sit in the opposite half from the stage circle
+    const startY = st.row === 'top' ? itemsBottomY : itemsTopY;
+    const startX = cx + cardXoffset - cardW / 2;     // centred horizontally with the circle
+
+    st.items.forEach((item, ci) => {
+      const x = startX;
+      const y = startY + ci * (cardH + cardGapY);
+      drawItem(svg, item, x, y, cardW, cardH, st);
+    });
+  });
+}
+
+/* ----- One item ("card") with icon + bold title + description ------------- */
+
+function drawItem(svg, item, x, y, w, h, stage) {
+  const hasUrl = !!(item.url && item.url.trim());
+
+  // Linked items get a real <a>; unlinked items get a plain <g> (no fake nav).
+  // Both groups carry the same CSS class so styling stays consistent.
+  const a = hasUrl
+    ? el('a', {
+        href: item.url, target: '_blank', rel: 'noopener noreferrer',
+      }, svg)
+    : el('g', { 'class': 'todo' }, svg);
+
+  // Invisible hit area (covers the whole item, fades in on hover for linked items)
+  el('rect', {
+    x: x - 6, y: y - 4, width: w + 12, height: h + 8, rx: 8,
+    fill: 'transparent', 'class': 'card-hit'
+  }, a);
+
+  // Icon
+  const iconSize = 44;
+  const iconCX = x + iconSize / 2 + 4;
+  const iconCY = y + iconSize / 2 + 6;
+  if (item.icon === 'dot') {
+    el('circle', { cx: iconCX, cy: iconCY, r: 7, fill: stage.color }, a);
+  } else {
+    drawIcon(a, item.icon, iconCX, iconCY, iconSize, stage.dark);
+  }
+
+  // Status badge under the icon — clearly visible "LINK TODO" for items without url,
+  // and a subtle "link ↗" hint for items that already have a working url.
+  const badge = el('g', { 'class': 'todo-badge' }, a);
+  const badgeW = 56;
+  const badgeX = iconCX - badgeW / 2;
+  const badgeY = iconCY + iconSize / 2 + 6;
+  if (hasUrl) {
+    el('rect', {
+      x: badgeX, y: badgeY, width: badgeW, height: 15, rx: 7,
+      fill: lighten(stage.color, 50), opacity: 0.6
+    }, badge);
+    el('text', {
+      x: badgeX + badgeW / 2, y: badgeY + 10.5,
+      'font-family': 'Nunito Sans, sans-serif', 'font-size': 8.5,
+      'font-weight': 700, 'letter-spacing': 0.6,
+      fill: stage.dark, 'text-anchor': 'middle'
+    }, badge).textContent = 'OPEN LINK \u2197';
+  } else {
+    el('rect', {
+      x: badgeX, y: badgeY, width: badgeW, height: 15, rx: 7,
+      fill: 'rgba(199,145,0,0.12)',
+      stroke: '#c79100', 'stroke-width': 0.8, 'stroke-dasharray': '3,2'
+    }, badge);
+    el('text', {
+      x: badgeX + badgeW / 2, y: badgeY + 10.5,
+      'font-family': 'Nunito Sans, sans-serif', 'font-size': 8.5,
+      'font-weight': 700, 'letter-spacing': 0.6,
+      fill: '#8a6700', 'text-anchor': 'middle'
+    }, badge).textContent = 'LINK TODO';
+  }
+
+  // Title text (bold uppercase) — gets full remaining width
+  const titleX = x + iconSize + 18;
+  const titleW = w - iconSize - 22;
+  const titleMaxChars = Math.floor(titleW / 6.0); // approx chars per line at 11.5px bold
+  const titleLines = wrapLines(item.title, titleMaxChars).slice(0, 2);
+  titleLines.forEach((line, li) => {
+    el('text', {
+      x: titleX, y: y + 14 + li * 14,
+      'font-family': 'Nunito, sans-serif', 'font-size': 16,
+      'font-weight': 800, 'letter-spacing': 0.3,
+      fill: hasUrl ? stage.dark : '#5a7a9a', 'class': 'card-title'
+    }, a).textContent = line;
+  });
+
+  // Description text
+  const descX = titleX;
+  const descStartY = y + 14 + titleLines.length * 14 + 8;
+  const descMaxChars = Math.floor(titleW / 5.6); // approx for 11px regular
+  const descLines = wrapLines(item.desc, descMaxChars).slice(0, 4);
+  descLines.forEach((line, li) => {
+    el('text', {
+      x: descX, y: descStartY + li * 13,
+      'font-family': 'Nunito Sans, sans-serif', 'font-size': 14,
+      'font-weight': 400, fill: '#33485e'
+    }, a).textContent = line;
+  });
+}
+
+/* ----- Boot ---------------------------------------------------------------- */
+render();
+</script>
+
+</body>
+</html>
