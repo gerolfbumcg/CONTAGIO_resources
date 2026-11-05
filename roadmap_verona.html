@@ -185,7 +185,7 @@ const STAGES = [
   {
     key: 'stage4',
     number: 4,
-    label: 'DATA & SAMPLE MANAGEMENT',
+    label: 'DATA & SAMPLE MANAGEMENT & SHARING',
     sublabel: '(WP3\u2013WP4)',
     row: 'bottom',
     col: 3,
@@ -725,7 +725,7 @@ function render() {
     }, svg).textContent = `STAGE ${st.number}:`;
 
     // Stage label (bold condensed uppercase, max 2 lines)
-    const labelLines = wrapLines(st.label, 19).slice(0, 2);
+    const labelLines = wrapLines(st.label, 20).slice(0, 2);
     const labelStartY = cy - 51;
     labelLines.forEach((line, li) => {
       el('text', {
