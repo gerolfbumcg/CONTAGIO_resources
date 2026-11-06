@@ -68,179 +68,52 @@
 </div>
 
 <div class="legend">
-  <span class="swatch todo"></span> = link still to be added (edit <code>STAGES[…].items[…].url</code> in the source)
+  <span class="swatch todo"></span> = link still to be added (set it in the wording editor: <code>python3 wording_server.py</code>)
 </div>
 
 <script>
 /* ============================================================================
-   DATA — edit this array to change titles, descriptions, icons or add URLs.
-   Each item has:
-     title : short heading shown in bold
-     desc  : 1–3 line description
-     icon  : icon key (see ICONS in drawIcon below)
-     url   : absolute URL, or null/'' if the link is not yet known
+   DATA — all texts, links and the topic order come from wording.json, which
+   is edited with the wording editor (editor.html, served by wording_server.py).
+   Shown text = the "new" wording when filled in, otherwise the "current" one.
+   Only the visual style per stage lives here.
    ============================================================================ */
 
-const TITLE    = 'CONTAGIO: A 5-Stage Roadmap for Rapid Epidemic Response';
-const SUBTITLE = 'A modular workflow to transition research groups from \u2018inter-epidemic\u2019 quiet periods to active, coordinated outbreak response units, bridging the gap for immediate data and sample availability.';
+const STAGE_STYLE = {
+  1: { row: 'top',    col: 0, color: '#2d5f8a', dark: '#1a3a5c', ring: '#1f3d66', ringDark: '#13294a', decorIcon: 'cohort' },
+  2: { row: 'bottom', col: 1, color: '#5bb8c4', dark: '#358a96', ring: '#4c9ca2', ringDark: '#33787f', decorIcon: 'shieldCert' },
+  3: { row: 'top',    col: 2, color: '#3aada0', dark: '#237a70', ring: '#4f9e97', ringDark: '#357771', decorIcon: 'tabletVial' },
+  4: { row: 'bottom', col: 3, color: '#5a8fb8', dark: '#3a6080', ring: '#3e70a0', ringDark: '#29527c', decorIcon: 'cloudData' },
+  5: { row: 'top',    col: 4, color: '#4a6580', dark: '#2d4560', ring: '#5b6571', ringDark: '#3d454f', decorIcon: 'funnelChart' },
+};
 
-const STAGES = [
-  {
-    key: 'stage1',
-    number: 1,
-    label: 'COHORT PREPAREDNESS',
-    sublabel: '(WP1 & WP2)',
-    row: 'top',           // 'top' | 'bottom' — items sit in the opposite half
-    col: 0,               // horizontal slot 0..4
-    color: '#2d5f8a',
-    dark:  '#1a3a5c',
-    ring: '#1f3d66', ringDark: '#13294a',
-    decorIcon: 'cohort',  // big icon inside the stage circle
-    items: [
-      {
-        title: 'BUILD YOUR CONSORTIUM',
-        desc:  'Establish Global Research Connections via Cohort Preparedness Platform to connect capabilities.',
-        icon:  'network',
-        url:   'https://contagio.shinyapps.io/StarterDashboard/',
-      },
-      {
-        title: 'DATA DISCOVERY',
-        desc:  'Access the EMBL Pathogens Portal to leverage existing relevant data and samples.',
-        icon:  'database',
-        url:   'https://www.pathogensportal.org/',
-      },
-      {
-        title: 'PUBLIC HEALTH ALIGNMENT',
-        desc:  'Integrate with Regional Authorities using the \u2018Integration\u2019 tool to define priorities and coordination.',
-        icon:  'people',
-        url:   null,
-      },
-    ],
-  },
-  {
-    key: 'stage2',
-    number: 2,
-    label: 'NAVIGATING ETHICS & GOVERNANCE',
-    sublabel: '(WP3 & WP4)',
-    row: 'bottom',
-    col: 1,
-    color: '#5bb8c4',
-    dark:  '#358a96',
-    ring: '#4c9ca2', ringDark: '#33787f',
-    decorIcon: 'shieldCert',
-    items: [
-      {
-        title: 'ACCELERATED CONSENT PROCEDURES',
-        desc:  'Implement standardized Broad Consent Guidelines and templates.',
-        icon:  'dot',
-        url:   null,
-      },
-      {
-        title: 'STREAMLINED ETHICAL APPROVAL',
-        desc:  'Use established guidelines and templates for Ethics Committee Applications during emergencies.',
-        icon:  'dot',
-        url:   null,
-      },
-    ],
-  },
-  {
-    key: 'stage3',
-    number: 3,
-    label: 'DESIGN DATA & SAMPLE COLLECTION TOOLS',
-    sublabel: '(WP2 & WP4)',
-    row: 'top',
-    col: 2,
-    color: '#3aada0',
-    dark:  '#237a70',
-    ring: '#4f9e97', ringDark: '#357771',
-    decorIcon: 'tabletVial',
-    items: [
-      {
-        title: 'IMMEDIATE PATIENT DATA COLLECTION',
-        desc:  'Access Pre-built eCRF Extensions developed with ISARIC for harmonized data.',
-        icon:  'clipboard',
-        url:   'https://bridge.isaric.org/main',
-      },
-      {
-        title: 'UNIFORM SAMPLE COLLECTION TEMPLATES',
-        desc:  'Utilize pre-built templates for Standardized Specimen Storage across sites.',
-        icon:  'vial',
-        url:   null,
-      },
-      {
-        title: 'ETHICAL AND LEGAL FRAMEWORKS',
-        desc:  'Access Regulatory Compliance resources and templates for local legal requirements.',
-        icon:  'scales',
-        url:   null,
-      },
-      { 
-        title: 'Language Integration Network Kit (LINK)',
-        desc:  'Validate and edit automatic machine translations of e-CRFs (es, pt & fr).',
-        icon:  'link',
-        url:   'https://link-mgea.vercel.app/',
-      },
-      
-    ],
-  },
-  {
-    key: 'stage4',
-    number: 4,
-    label: 'DATA & SAMPLE MANAGEMENT & SHARING',
-    sublabel: '(WP3\u2013WP4)',
-    row: 'bottom',
-    col: 3,
-    color: '#5a8fb8',
-    dark:  '#3a6080',
-    ring: '#3e70a0', ringDark: '#29527c',
-    decorIcon: 'cloudData',
-    items: [
-      {
-        title: 'TRANSPARENT DATA REQUEST REVIEWS',
-        desc:  'Follow Data Access Committee (DAC) Roadmap and use DTA templates.',
-        icon:  'cloud',
-        url:   null,
-      },
-      {
-        title: 'GLOBAL SPECIMEN CATALOGING',
-        desc:  'Use the Virtual Biorepository System (VBS) for global governance framework cataloging.',
-        icon:  'brain',
-        url:   null,
-      },
-      {
-        title: 'FACILITATED SAMPLE SHARING POLICIES',
-        desc:  'Apply 10x10 Sharing Project policies for flow of physical materials.',
-        icon:  'share',
-        url:   null,
-      },
-    ],
-  },
-  {
-    key: 'stage5',
-    number: 5,
-    label: 'INTEGRATION & ANALYSIS',
-    sublabel: '',
-    row: 'top',
-    col: 4,
-    color: '#4a6580',
-    dark:  '#2d4560',
-    ring: '#5b6571', ringDark: '#3d454f',
-    decorIcon: 'funnelChart',
-    items: [
-      {
-        title: 'PATHOGENS PORTAL INTEGRATION',
-        desc:  'Flow multimodal data through Interoperable Data Pipeline standards for immediate use, using established interoperability standards.',
-        icon:  'dot',
-        url:   null,
-      },
-      {
-        title: 'HIGH-QUALITY RESEARCH STANDARDS',
-        desc:  'Address measurement errors using EID Measurement Guidance to ensure data integrity.',
-        icon:  'dot',
-        url:   null,
-      },
-    ],
-  },
-];
+let TITLE = '', SUBTITLE = '', STAGES = [];
+let FOCUS = null;            // topic id ('T2.3') or stage id ('S2') highlighted by the editor
+let ZOOM_STAGE = null;       // stage number to zoom the preview on (editor only)
+let OVERFLOW = [];           // ids whose text was cut off while rendering
+
+const pick = (n, c) => (typeof n === 'string' && n.trim()) ? n.trim() : (c || '');
+
+function applyWording(data) {
+  TITLE = data.title;
+  SUBTITLE = data.subtitle;
+  STAGES = data.stages.map(s => ({
+    ...STAGE_STYLE[s.stage],
+    number: s.stage,
+    label: pick(s.new && s.new.label, s.current.label).toUpperCase(),
+    sublabel: pick(s.new && s.new.sublabel, s.current.sublabel),
+    items: s.topics
+      .map(id => [id, data.topics[id]])
+      .filter(([, t]) => t && t.show && (pick(t.new && t.new.title, t.current.title) || pick(t.new && t.new.desc, t.current.desc)))
+      .map(([id, t]) => ({
+        id,
+        title: pick(t.new && t.new.title, t.current.title),
+        desc:  pick(t.new && t.new.desc,  t.current.desc),
+        icon:  t.icon || 'dot',
+        url:   t.url || null,
+      })),
+  }));
+}
 
 /* ============================================================================
    LAYOUT — change these if you want to nudge positions
@@ -260,9 +133,9 @@ const LAYOUT = {
   colX: [180, 540, 880, 1220, 1555], // x-centre for each of the 5 columns
 
   // Items — vertical column, same x as the circle, opposite half of canvas
-  cardW: 200,
-  cardH: 100,
-  cardGapY: 18,
+  cardW: 300,          // wider cards (was 200); left edge stays at cx - 140
+  cardH: 100,          // minimum card height; real height follows the text
+  cardGapY: 16,
   itemsTopY: 240, //195,       // y where items start for BOTTOM-row stages (items go above circle)
   itemsBottomY: 530,    // y where items start for TOP-row stages (items go below circle)
 };
@@ -285,6 +158,40 @@ function el(tag, attrs, parent) {
 function lighten(hex, amt) {
   const n = parseInt(hex.replace('#', ''), 16);
   return `rgb(${Math.min(255, (n >> 16) + amt)},${Math.min(255, ((n >> 8) & 0xff) + amt)},${Math.min(255, (n & 0xff) + amt)})`;
+}
+
+/* Wrap by measured pixel width (canvas), so lines use the real card width. */
+const _measureCtx = document.createElement('canvas').getContext('2d');
+function wrapMeasured(text, font, maxW, letterSpacing = 0) {
+  _measureCtx.font = font;
+  const width = t => _measureCtx.measureText(t).width + letterSpacing * t.length;
+  const lines = [];
+  let cur = '';
+  for (const w of String(text || '').split(/\s+/).filter(Boolean)) {
+    const test = cur ? cur + ' ' + w : w;
+    if (cur && width(test) > maxW) { lines.push(cur); cur = w; } else cur = test;
+  }
+  if (cur) lines.push(cur);
+  return lines;
+}
+
+const CARD = {
+  iconSize: 44, textDX: 62,              // text starts 62px right of the card's left edge
+  titleFont: "800 16px Nunito, sans-serif", titleLS: 0.3, titleLH: 19, titleMax: 3,
+  descFont: "400 14px 'Nunito Sans', sans-serif", descLH: 17.5, descMax: 6,
+  minH: 84,
+};
+
+/* Lay out one card: wrapped lines, height and whether text had to be cut. */
+function layoutItem(item, w) {
+  const textW = w - CARD.textDX - 4;
+  const tAll = wrapMeasured(item.title, CARD.titleFont, textW, CARD.titleLS);
+  const dAll = wrapMeasured(item.desc, CARD.descFont, textW);
+  const titleLines = tAll.slice(0, CARD.titleMax);
+  const descLines = dAll.slice(0, CARD.descMax);
+  const h = Math.max(CARD.minH,
+    6 + titleLines.length * CARD.titleLH + (descLines.length ? 6 + descLines.length * CARD.descLH : 0));
+  return { titleLines, descLines, h, cut: tAll.length > CARD.titleMax || dAll.length > CARD.descMax };
 }
 
 function wrapLines(text, maxChars) {
@@ -699,9 +606,19 @@ function drawStageIcon(parent, type, cx, cy, w) {
 
 function render() {
   const svg = document.getElementById('diagram');
-  const { W, H, headerH, subtitleY, subtitleMaxChars,
+  svg.replaceChildren();
+  OVERFLOW = [];
+  const { W, headerH, subtitleY, subtitleMaxChars,
           bubbleR, topRowY, bottomRowY, colX,
           cardW, cardH, cardGapY, itemsTopY, itemsBottomY } = LAYOUT;
+  // Lay out all cards first (measured text), so column heights are known
+  STAGES.forEach(st => {
+    st._layouts = st.items.map(it => layoutItem(it, cardW));
+    st._colH = st._layouts.reduce((a, l) => a + l.h, 0) + Math.max(0, st.items.length - 1) * cardGapY;
+  });
+  // Grow the canvas when a top-row stage has a tall column of cards below its circle
+  const maxTopH = Math.max(0, ...STAGES.filter(s => s.row === 'top').map(s => s._colH));
+  const H = Math.max(LAYOUT.H, itemsBottomY + maxTopH + 30);
 
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
   svg.setAttribute('width', W);
@@ -784,6 +701,10 @@ function render() {
 
     // Thick shaded ring with drop shadow
     el('circle', { cx, cy, r: bubbleR, fill: `url(#sg${i})`, filter: 'url(#shRing)' }, svg);
+    if (FOCUS === `S${st.number}`) {
+      el('circle', { cx, cy, r: bubbleR + 9, fill: 'none', stroke: '#e8a317',
+        'stroke-width': 4, 'stroke-dasharray': '10,6' }, svg);
+    }
     // Inner-edge shadow + white disc
     el('circle', { cx, cy, r: innerR + 0.5, fill: 'none',
       stroke: 'rgba(0,0,0,0.28)', 'stroke-width': 4, filter: 'url(#blurIn)' }, svg);
@@ -798,7 +719,9 @@ function render() {
     }, svg).textContent = `STAGE ${st.number}:`;
 
     // Stage label (bold condensed uppercase, max 2 lines)
-    const labelLines = wrapLines(st.label, 20).slice(0, 2);
+    const allLabelLines = wrapLines(st.label, 20);
+    if (allLabelLines.length > 2) OVERFLOW.push(`S${st.number}`);
+    const labelLines = allLabelLines.slice(0, 2);
     const labelStartY = cy - 51;
     labelLines.forEach((line, li) => {
       el('text', {
@@ -824,109 +747,149 @@ function render() {
   // ── Items ── (vertical column directly above or below the stage circle)
   STAGES.forEach((st) => {
     const cx = colX[st.col];
-    const cardXoffset = -40;
-    // Items always sit in the opposite half from the stage circle
-    const startY = st.row === 'top' ? itemsBottomY : itemsTopY;
-    const startX = cx + cardXoffset - cardW / 2;     // centred horizontally with the circle
-
+    const cy = st.row === 'top' ? topRowY : bottomRowY;
+    const startX = cx - 140;                         // left edge as before; cards grow to the right
+    let startY = st.row === 'top' ? itemsBottomY : itemsTopY;
+    if (st.row === 'bottom') {
+      // Cards sit above a bottom-row circle: move the column up if it is tall
+      const limit = bottomRowY - bubbleR - 14;
+      if (startY + st._colH > limit) {
+        startY = Math.max(185, limit - st._colH);
+        if (startY + st._colH > limit) st.items.forEach(it => OVERFLOW.push(`${it.id}:crowded`));
+      }
+    }
+    let y = startY;
     st.items.forEach((item, ci) => {
-      const x = startX;
-      const y = startY + ci * (cardH + cardGapY);
-      drawItem(svg, item, x, y, cardW, cardH, st);
+      const L = st._layouts[ci];
+      if (L.cut) OVERFLOW.push(item.id);
+      drawItem(svg, item, startX, y, cardW, L, st);
+      y += L.h + cardGapY;
     });
+    const n = st.items.length;
+    st._box = {
+      x0: Math.min(startX - 20, cx - bubbleR - 20), x1: Math.max(startX + cardW + 20, cx + bubbleR + 20),
+      y0: Math.min(n ? startY - 20 : Infinity, cy - bubbleR - 20),
+      y1: Math.max(n ? startY + st._colH + 20 : -Infinity, cy + bubbleR + 20),
+    };
   });
 }
 
 /* ----- One item ("card") with icon + bold title + description ------------- */
 
-function drawItem(svg, item, x, y, w, h, stage) {
+function drawItem(svg, item, x, y, w, L, stage) {
   const hasUrl = !!(item.url && item.url.trim());
+  const h = L.h;
 
   // Linked items get a real <a>; unlinked items get a plain <g> (no fake nav).
-  // Both groups carry the same CSS class so styling stays consistent.
   const a = hasUrl
-    ? el('a', {
-        href: item.url, target: '_blank', rel: 'noopener noreferrer',
-      }, svg)
+    ? el('a', { href: item.url, target: '_blank', rel: 'noopener noreferrer' }, svg)
     : el('g', { 'class': 'todo' }, svg);
 
   // Invisible hit area (covers the whole item, fades in on hover for linked items)
-  el('rect', {
-    x: x - 6, y: y - 4, width: w + 12, height: h + 8, rx: 8,
-    fill: 'transparent', 'class': 'card-hit'
-  }, a);
+  el('rect', { x: x - 6, y: y - 4, width: w + 12, height: h + 8, rx: 8,
+    fill: 'transparent', 'class': 'card-hit' }, a);
+  if (FOCUS && FOCUS === item.id) {
+    el('rect', { x: x - 12, y: y - 10, width: w + 24, height: h + 20, rx: 12,
+      fill: 'rgba(232,163,23,0.08)', stroke: '#e8a317', 'stroke-width': 3,
+      'stroke-dasharray': '8,5' }, a);
+  }
 
   // Icon
-  const iconSize = 44;
+  const iconSize = CARD.iconSize;
   const iconCX = x + iconSize / 2 + 4;
-  const iconCY = y + iconSize / 2 + 6;
+  const iconCY = y + iconSize / 2 + 2;
   if (item.icon === 'dot') {
     el('circle', { cx: iconCX, cy: iconCY, r: 7, fill: stage.color }, a);
   } else {
     drawIcon(a, item.icon, iconCX, iconCY, iconSize, stage.dark);
   }
 
-  // Status badge under the icon — clearly visible "LINK TODO" for items without url,
-  // and a subtle "link ↗" hint for items that already have a working url.
+  // Badge under the icon: "OPEN LINK ↗" when there is a url, otherwise "LINK TODO"
   const badge = el('g', { 'class': 'todo-badge' }, a);
   const badgeW = 56;
   const badgeX = iconCX - badgeW / 2;
   const badgeY = iconCY + iconSize / 2 + 6;
-  if (hasUrl) {
-    el('rect', {
-      x: badgeX, y: badgeY, width: badgeW, height: 15, rx: 7,
-      fill: lighten(stage.color, 50), opacity: 0.6
-    }, badge);
-    el('text', {
-      x: badgeX + badgeW / 2, y: badgeY + 10.5,
-      'font-family': 'Nunito Sans, sans-serif', 'font-size': 8.5,
-      'font-weight': 700, 'letter-spacing': 0.6,
-      fill: stage.dark, 'text-anchor': 'middle'
-    }, badge).textContent = 'OPEN LINK \u2197';
-  } else {
-    el('rect', {
-      x: badgeX, y: badgeY, width: badgeW, height: 15, rx: 7,
-      fill: 'rgba(199,145,0,0.12)',
-      stroke: '#c79100', 'stroke-width': 0.8, 'stroke-dasharray': '3,2'
-    }, badge);
-    el('text', {
-      x: badgeX + badgeW / 2, y: badgeY + 10.5,
-      'font-family': 'Nunito Sans, sans-serif', 'font-size': 8.5,
-      'font-weight': 700, 'letter-spacing': 0.6,
-      fill: '#8a6700', 'text-anchor': 'middle'
-    }, badge).textContent = 'LINK TODO';
-  }
+  el('rect', hasUrl
+    ? { x: badgeX, y: badgeY, width: badgeW, height: 15, rx: 7, fill: lighten(stage.color, 50), opacity: 0.6 }
+    : { x: badgeX, y: badgeY, width: badgeW, height: 15, rx: 7, fill: 'rgba(199,145,0,0.12)',
+        stroke: '#c79100', 'stroke-width': 0.8, 'stroke-dasharray': '3,2' }, badge);
+  el('text', { x: badgeX + badgeW / 2, y: badgeY + 10.5,
+    'font-family': 'Nunito Sans, sans-serif', 'font-size': 8.5, 'font-weight': 700, 'letter-spacing': 0.6,
+    fill: hasUrl ? stage.dark : '#8a6700', 'text-anchor': 'middle' }, badge)
+    .textContent = hasUrl ? 'OPEN LINK \u2197' : 'LINK TODO';
 
-  // Title text (bold uppercase) — gets full remaining width
-  const titleX = x + iconSize + 18;
-  const titleW = w - iconSize - 22;
-  const titleMaxChars = Math.floor(titleW / 6.0); // approx chars per line at 11.5px bold
-  const titleLines = wrapLines(item.title, titleMaxChars).slice(0, 2);
-  titleLines.forEach((line, li) => {
-    el('text', {
-      x: titleX, y: y + 14 + li * 14,
-      'font-family': 'Nunito, sans-serif', 'font-size': 16,
-      'font-weight': 800, 'letter-spacing': 0.3,
-      fill: hasUrl ? stage.dark : '#5a7a9a', 'class': 'card-title'
-    }, a).textContent = line;
+  // Title (bold) and description, wrapped to the measured card width
+  const textX = x + CARD.textDX;
+  let ty = y + 16;
+  L.titleLines.forEach(line => {
+    el('text', { x: textX, y: ty, 'font-family': 'Nunito, sans-serif', 'font-size': 16,
+      'font-weight': 800, 'letter-spacing': CARD.titleLS,
+      fill: hasUrl ? stage.dark : '#5a7a9a', 'class': 'card-title' }, a).textContent = line;
+    ty += CARD.titleLH;
   });
-
-  // Description text
-  const descX = titleX;
-  const descStartY = y + 14 + titleLines.length * 14 + 8;
-  const descMaxChars = Math.floor(titleW / 5.6); // approx for 11px regular
-  const descLines = wrapLines(item.desc, descMaxChars).slice(0, 4);
-  descLines.forEach((line, li) => {
-    el('text', {
-      x: descX, y: descStartY + li * 13,
-      'font-family': 'Nunito Sans, sans-serif', 'font-size': 14,
-      'font-weight': 400, fill: '#33485e'
-    }, a).textContent = line;
+  ty += 4;
+  L.descLines.forEach(line => {
+    el('text', { x: textX, y: ty, 'font-family': 'Nunito Sans, sans-serif', 'font-size': 14,
+      'font-weight': 400, fill: '#33485e' }, a).textContent = line;
+    ty += CARD.descLH;
   });
 }
 
 /* ----- Boot ---------------------------------------------------------------- */
-render();
+// Standalone: load wording.json. Inside the editor's preview iframe, the editor
+// also sends its unsaved data via postMessage, so changes show up immediately.
+let gotLiveData = false;
+const inEditor = window.parent !== window;
+if (inEditor) {
+  document.querySelector('.legend').style.display = 'none';
+  document.querySelector('.diagram-wrap').style.padding = '0';
+}
+
+function renderAndReport() {
+  render();
+  const svg = document.getElementById('diagram');
+  const zs = ZOOM_STAGE && STAGES.find(s => s.number === ZOOM_STAGE);
+  if (zs && zs._box) {
+    const b = zs._box;
+    svg.setAttribute('viewBox', `${b.x0} ${b.y0} ${b.x1 - b.x0} ${b.y1 - b.y0}`);
+    svg.setAttribute('width', b.x1 - b.x0);
+    svg.setAttribute('height', b.y1 - b.y0);
+  }
+  if (inEditor) window.parent.postMessage({ type: 'contagio-rendered', overflow: OVERFLOW }, location.origin);
+}
+
+window.addEventListener('message', e => {
+  if (e.origin !== location.origin) return;
+  const m = e.data;
+  if (m && m.type === 'contagio-wording') {
+    gotLiveData = true;
+    FOCUS = m.focus || null;
+    ZOOM_STAGE = m.zoomStage || null;
+    applyWording(m.data);
+    renderAndReport();
+  }
+});
+
+fetch('wording.json', { cache: 'no-store' })
+  .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+  .then(data => { if (!gotLiveData) { applyWording(data); renderAndReport(); } })
+  .catch(() => {
+    if (gotLiveData) return;
+    const svg = document.getElementById('diagram');
+    svg.setAttribute('viewBox', '0 0 900 120');
+    el('text', { x: 450, y: 55, 'text-anchor': 'middle', 'font-family': 'Nunito Sans, sans-serif',
+      'font-size': 20, fill: '#8a2a2a' }, svg).textContent =
+      'Could not load wording.json. Open this page via the live site or the local server:';
+    el('text', { x: 450, y: 88, 'text-anchor': 'middle', 'font-family': 'monospace',
+      'font-size': 18, fill: '#1a2a3a' }, svg).textContent = 'python3 wording_server.py';
+  });
+
+if (inEditor) window.parent.postMessage({ type: 'contagio-ready' }, location.origin);
+
+// Text is wrapped by measuring it, so render again once the web fonts have loaded
+Promise.all(["800 16px Nunito", "400 14px 'Nunito Sans'", "700 20px 'Roboto Condensed'"].map(f => document.fonts.load(f)))
+  .then(() => document.fonts.ready)
+  .then(() => { if (STAGES.length) renderAndReport(); });
 </script>
 
 </body>

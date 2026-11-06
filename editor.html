@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Roadmap Wording Editor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #eef2f6;
+    --panel: #ffffff;
+    --ink: #1b2838;
+    --muted: #5d6f84;
+    --line: #d5dde6;
+    --navy: #1f3d66;
+    --accent: #e8a317;
+    --todo: #a9b4c0;
+    --draft: #e8a317;
+    --final: #2e9b6a;
+    --warn: #c2412d;
+    --s1: #1f3d66; --s2: #4c9ca2; --s3: #4f9e97; --s4: #3e70a0; --s5: #5b6571;
+    --radius: 10px;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    font-family: 'Nunito Sans', system-ui, sans-serif;
+    color: var(--ink); background: var(--bg);
+    display: grid; grid-template-rows: auto auto 1fr; overflow: hidden;
+  }
+  button, input, textarea, select { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+
+  /* ── Top bar ── */
+  header.top {
+    display: flex; align-items: center; gap: 16px; padding: 10px 18px;
+    background: var(--navy); color: #fff;
+  }
+  header.top h1 {
+    margin: 0; font: 700 20px 'Roboto Condensed', sans-serif; letter-spacing: .3px;
+  }
+  header.top h1 span { color: #cfe2f3; }
+  .tabs { display: flex; background: rgba(255,255,255,.12); border-radius: 8px; padding: 3px; }
+  .tabs button {
+    border: 0; background: none; color: #dfe9f3; padding: 5px 14px; border-radius: 6px; font-weight: 700;
+  }
+  .tabs button[aria-pressed="true"] { background: #fff; color: var(--navy); }
+  .spacer { flex: 1; }
+  .progress { font-size: 13px; color: #dfe9f3; white-space: nowrap; }
+  .progress b { color: #fff; }
+  .save {
+    font-size: 13px; padding: 4px 10px; border-radius: 999px; background: rgba(255,255,255,.14);
+    white-space: nowrap;
+  }
+  .save.ok::before { content: '\2713  '; }
+  .save.err { background: var(--warn); }
+  .top .btn-light {
+    border: 1px solid rgba(255,255,255,.4); background: none; color: #fff; border-radius: 6px; padding: 4px 10px; font-size: 13px;
+  }
+
+  .banner {
+    display: none; padding: 8px 18px; background: #fff4d6; border-bottom: 1px solid #ecd28a; font-size: 14px;
+  }
+  .banner.show { display: block; }
+  .banner code { background: #fff; padding: 1px 6px; border-radius: 4px; }
+
+  /* ── Main layout ── */
+  main { display: grid; grid-template-columns: 250px minmax(420px, 1fr) minmax(360px, 0.9fr); min-height: 0; }
+  main.board-mode { grid-template-columns: 1fr; grid-template-rows: minmax(0, 1.15fr) minmax(0, 1fr); }
+  main.board-mode nav, main.board-mode #slide { display: none; }
+  main:not(.board-mode) #board { display: none; }
+
+  nav {
+    overflow-y: auto; border-right: 1px solid var(--line); background: var(--panel); padding: 10px 0;
+  }
+  nav .group { margin-bottom: 6px; }
+  nav button {
+    display: flex; width: 100%; align-items: center; gap: 8px; text-align: left;
+    border: 0; background: none; padding: 5px 14px; font-size: 13.5px; line-height: 1.3;
+  }
+  nav button:hover { background: #f1f5f9; }
+  nav button.active { background: #e3edf7; box-shadow: inset 3px 0 0 var(--navy); }
+  nav button.stage-btn { font: 700 14px 'Roboto Condensed', sans-serif; text-transform: uppercase; padding-top: 9px; }
+  nav .sw { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+  nav .tid { font-weight: 800; color: var(--muted); width: 34px; flex: none; font-size: 12px; }
+  nav .ttl { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  nav .hidden .ttl { font-style: italic; color: var(--muted); }
+  .dot { width: 9px; height: 9px; border-radius: 50%; flex: none; background: var(--todo); }
+  .dot.draft { background: var(--draft); }
+  .dot.final { background: var(--final); }
+  .warn-ic { color: var(--warn); font-weight: 900; }
+
+  /* ── Slide ── */
+  #slide { overflow-y: auto; padding: 22px 26px 30px; }
+  .slide-card { background: var(--panel); border-radius: 14px; box-shadow: 0 2px 10px rgba(20,40,70,.08); padding: 22px 24px; }
+  .slide-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+  .id-chip {
+    font: 700 26px 'Roboto Condensed', sans-serif; color: #fff; padding: 2px 12px; border-radius: 8px;
+  }
+  .stage-chip { font-weight: 700; color: var(--muted); font-size: 14px; }
+  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; margin-left: auto; }
+  .seg button { border: 0; background: #fff; padding: 5px 12px; font-size: 13px; font-weight: 700; color: var(--muted); }
+  .seg button + button { border-left: 1px solid var(--line); }
+  .seg button[aria-pressed="true"][data-v=""] { background: #eef1f4; color: var(--ink); }
+  .seg button[aria-pressed="true"][data-v="draft"] { background: #fdf0d2; color: #8a5d00; }
+  .seg button[aria-pressed="true"][data-v="final"] { background: #dcf2e7; color: #1d6b48; }
+
+  .refs { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; margin-bottom: 18px; }
+  .ref { border: 1px solid var(--line); border-radius: var(--radius); padding: 10px 12px; font-size: 13.5px; background: #fbfcfd; display: flex; flex-direction: column; }
+  .ref h3 { margin: 0 0 6px; font-size: 11.5px; letter-spacing: .6px; text-transform: uppercase; color: var(--muted); display: flex; justify-content: space-between; }
+  .ref .rt { font-weight: 800; margin-bottom: 3px; }
+  .ref .rd { color: #33485e; flex: 1; }
+  .ref.empty .rd { color: var(--muted); font-style: italic; }
+  .ref button { align-self: flex-start; margin-top: 8px; border: 1px solid var(--line); background: #fff; border-radius: 6px; padding: 2px 9px; font-size: 12px; font-weight: 700; color: var(--navy); }
+  .ref button:hover { border-color: var(--navy); }
+  .meta-note { font-size: 13px; color: var(--muted); margin: -8px 0 16px; }
+
+  .field { margin-bottom: 14px; }
+  .field label { display: flex; justify-content: space-between; font-weight: 800; font-size: 13px; margin-bottom: 5px; }
+  .field label small { font-weight: 600; color: var(--muted); }
+  .field input[type=text], .field input[type=url], .field textarea {
+    width: 100%; border: 1.5px solid var(--line); border-radius: 8px; padding: 9px 11px; background: #fff; font-size: 15px;
+  }
+  .field textarea { min-height: 84px; resize: vertical; line-height: 1.45; }
+  .field input:focus, .field textarea:focus, select:focus { outline: none; border-color: var(--navy); box-shadow: 0 0 0 3px rgba(31,61,102,.12); }
+  .field .placeholder-hint { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .fit-warn { display: none; color: var(--warn); font-size: 13px; font-weight: 700; margin-top: 4px; }
+  .fit-warn.show { display: block; }
+
+  .row { display: flex; gap: 14px; align-items: flex-end; flex-wrap: wrap; }
+  .row .field { flex: 1; min-width: 160px; }
+  select { border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 10px; background: #fff; }
+  .toggle { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; cursor: pointer; padding-bottom: 10px; }
+  .toggle input { width: 18px; height: 18px; }
+
+  .slide-nav { display: flex; align-items: center; gap: 10px; margin-top: 18px; }
+  .slide-nav button { border: 1px solid var(--line); background: #fff; border-radius: 8px; padding: 7px 14px; font-weight: 700; }
+  .slide-nav button:hover:not(:disabled) { border-color: var(--navy); }
+  .slide-nav button:disabled { opacity: .4; cursor: default; }
+  .slide-nav .pos { color: var(--muted); font-size: 13px; }
+  .kbd { font-size: 12px; color: var(--muted); margin-left: auto; }
+  kbd { border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; padding: 0 5px; background: #fff; font-size: 11px; }
+
+  .stage-topics { list-style: none; padding: 0; margin: 6px 0 0; }
+  .stage-topics li { display: flex; gap: 8px; align-items: center; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; margin-bottom: 6px; background: #fff; font-size: 14px; }
+  .stage-topics li.hidden { opacity: .55; font-style: italic; }
+  .stage-topics .grow { flex: 1; cursor: pointer; }
+  .stage-topics .mini { border: 1px solid var(--line); background: #fff; border-radius: 5px; padding: 0 7px; font-size: 13px; }
+
+  .add-btn { border: 1.5px dashed #9fb2c6; background: none; color: var(--navy); border-radius: 8px; padding: 6px 10px; font-weight: 700; font-size: 13px; width: 100%; }
+  .add-btn:hover { background: #fff; border-color: var(--navy); }
+  .del-btn { border: 1px solid #e3b4ab; background: #fff; color: var(--warn); border-radius: 8px; padding: 7px 14px; font-weight: 700; }
+  .del-btn:hover { background: #fdf0ed; }
+  nav .add-mini { color: var(--muted); font-size: 12.5px; padding: 3px 14px 3px 56px; }
+  nav .add-mini:hover { color: var(--navy); }
+
+  /* ── Board ── */
+  #board { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; padding: 14px 16px; overflow: auto; }
+  .col { background: #e3e9f0; border-radius: 12px; padding: 8px; display: flex; flex-direction: column; min-height: 0; }
+  .col-head { border-radius: 9px; color: #fff; padding: 8px 10px; cursor: pointer; margin-bottom: 8px; }
+  .col-head .n { font: 700 13px 'Roboto Condensed', sans-serif; opacity: .85; }
+  .col-head .l { font: 700 15px 'Roboto Condensed', sans-serif; text-transform: uppercase; line-height: 1.15; }
+  .col-list { flex: 1; min-height: 60px; overflow-y: auto; padding-bottom: 20px; }
+  .card {
+    background: #fff; border-radius: 9px; padding: 8px 10px; margin-bottom: 7px; box-shadow: 0 1px 3px rgba(20,40,70,.12);
+    cursor: grab; font-size: 13px; border: 2px solid transparent; position: relative;
+  }
+  .card:hover { border-color: #b9c9da; }
+  .card.hidden { opacity: .55; border: 2px dashed #b9c4d0; box-shadow: none; }
+  .card.dragging { opacity: .35; }
+  .card .ch { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; }
+  .card .ch b { font-size: 12px; color: var(--muted); }
+  .card .ct { font-weight: 800; line-height: 1.25; }
+  .card .cd { color: #4a5d72; line-height: 1.3; margin-top: 2px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .card .eye { margin-left: auto; border: 0; background: none; padding: 0 2px; font-size: 14px; color: var(--muted); }
+  .drop-line { height: 4px; border-radius: 2px; background: var(--accent); margin: -2px 0 5px; }
+
+  /* ── Preview ── */
+  #preview { display: flex; flex-direction: column; border-left: 1px solid var(--line); background: #e9f0f5; min-height: 0; }
+  main.board-mode #preview { border-left: 0; border-top: 1px solid var(--line); }
+  .pv-head { display: flex; align-items: center; gap: 10px; padding: 8px 12px; font-size: 13px; font-weight: 700; color: var(--muted); background: var(--panel); border-bottom: 1px solid var(--line); }
+  .pv-head .seg { margin-left: auto; }
+  #pv { flex: 1; width: 100%; border: 0; background: #e9f0f5; }
+
+  /* Narrower windows: preview moves under the slide */
+  @media (max-width: 1180px) {
+    main:not(.board-mode) { grid-template-columns: 220px minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) minmax(260px, 42vh); }
+    main:not(.board-mode) nav { grid-row: 1 / span 2; }
+    main:not(.board-mode) #preview { grid-column: 2; border-left: 0; border-top: 1px solid var(--line); }
+    #slide { padding: 16px; }
+    .progress { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <h1><span>CONTAGIO:</span> Roadmap wording</h1>
+  <div class="tabs" role="group" aria-label="View">
+    <button id="tab-slides" aria-pressed="true">Slides</button>
+    <button id="tab-board" aria-pressed="false">Board</button>
+  </div>
+  <div class="spacer"></div>
+  <div class="progress" id="progress"></div>
+  <div class="save" id="save">Loading…</div>
+  <button class="btn-light" id="download" title="Download wording.json">Download JSON</button>
+</header>
+<div class="banner" id="banner"></div>
+
+<main id="main">
+  <nav id="nav" aria-label="Stages and topics"></nav>
+  <section id="slide"></section>
+  <section id="board" aria-label="Board"></section>
+  <section id="preview">
+    <div class="pv-head">
+      Live preview <span id="pv-note" style="font-weight:600"></span>
+      <div class="seg" role="group" aria-label="Preview zoom">
+        <button data-zoom="stage" aria-pressed="true">This stage</button>
+        <button data-zoom="full" aria-pressed="false">Whole roadmap</button>
+      </div>
+    </div>
+    <iframe id="pv" src="roadmap_verona.html" title="Roadmap preview"></iframe>
+  </section>
+</main>
+
+<script>
+/* ============================================================================
+   State
+   ============================================================================ */
+let DATA = null;
+let WRITABLE = false;
+let cur = 'S1';                 // current slide: 'S<n>' for a stage, 'T<x>.<y>' for a topic
+let view = 'slides';
+let zoom = 'stage';
+let overflow = new Set();       // ids reported as cut off by the preview
+let saveTimer = null, previewTimer = null, dirty = false;
+
+const ICONS = ['dot', 'network', 'database', 'people', 'clipboard', 'vial', 'scales', 'cloud', 'brain', 'share', 'link'];
+const STATUS = [['', 'To do'], ['draft', 'Draft'], ['final', 'Final']];
+const $ = s => document.querySelector(s);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const filled = s => typeof s === 'string' && s.trim() !== '';
+const pick = (n, c) => filled(n) ? n.trim() : (c || '');
+
+const stageOf = tid => DATA.stages.find(s => s.topics.includes(tid));
+const stageById = id => DATA.stages.find(s => 'S' + s.stage === id);
+const stageColor = n => getComputedStyle(document.documentElement).getPropertyValue('--s' + n).trim();
+
+/* Slide order: S1, its topics, S2, its topics, ... (follows the board order) */
+function order() {
+  const out = [];
+  DATA.stages.forEach(s => { out.push('S' + s.stage); s.topics.forEach(t => out.push(t)); });
+  return out;
+}
+
+/* ============================================================================
+   Load / save
+   ============================================================================ */
+async function load() {
+  try {
+    const r = await fetch('wording.json', { cache: 'no-store' });
+    DATA = await r.json();
+  } catch (e) {
+    $('#save').textContent = 'Could not load wording.json';
+    $('#save').className = 'save err';
+    banner('Open this editor through the local server: <code>python3 wording_server.py</code>');
+    return;
+  }
+  try {
+    const p = await fetch('api/ping', { cache: 'no-store' });
+    WRITABLE = p.ok && (await p.json()).writable;
+  } catch (e) { WRITABLE = false; }
+  if (!WRITABLE) {
+    banner('Read-only: changes are not saved here. Start <code>python3 wording_server.py</code> in the repo folder to edit, or use <b>Download JSON</b>.');
+    setSave('Read-only', '');
+  } else {
+    setSave('All changes saved', 'ok');
+  }
+  const hash = decodeURIComponent(location.hash.slice(1));
+  if (hash && order().includes(hash)) cur = hash;
+  renderAll();
+}
+
+function banner(html) { const b = $('#banner'); b.innerHTML = html; b.classList.add('show'); }
+function setSave(text, cls) { const s = $('#save'); s.textContent = text; s.className = 'save ' + (cls || ''); }
+
+function changed(opts = {}) {
+  dirty = true;
+  schedulePreview();
+  if (opts.rerender) renderAll(); else { renderNav(); renderProgress(); if (view === 'board') renderBoard(); }
+  if (!WRITABLE) { setSave('Not saved (read-only)', 'err'); return; }
+  setSave('Saving…', '');
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(save, 600);
+}
+
+async function save() {
+  try {
+    const r = await fetch('api/wording', {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(DATA),
+    });
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.error || r.status);
+    dirty = false;
+    setSave('Saved ' + j.savedAt + (j.warning ? ' (' + j.warning + ')' : ''), 'ok');
+  } catch (e) {
+    setSave('Save failed: ' + e.message, 'err');
+  }
+}
+
+window.addEventListener('beforeunload', e => { if (dirty && WRITABLE) { e.preventDefault(); e.returnValue = ''; } });
+
+$('#download').onclick = () => {
+  const blob = new Blob([JSON.stringify(DATA, null, 2) + '\n'], { type: 'application/json' });
+  const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: 'wording.json' });
+  a.click(); URL.revokeObjectURL(a.href);
+};
+
+/* ============================================================================
+   Preview (roadmap_verona.html in an iframe, fed by postMessage)
+   ============================================================================ */
+function schedulePreview() { clearTimeout(previewTimer); previewTimer = setTimeout(sendPreview, 120); }
+function sendPreview() {
+  const w = $('#pv').contentWindow;
+  if (!w || !DATA) return;
+  const st = cur.startsWith('S') ? stageById(cur) : stageOf(cur);
+  w.postMessage({
+    type: 'contagio-wording', data: DATA, focus: cur,
+    zoomStage: zoom === 'stage' && view === 'slides' && st ? st.stage : null,
+  }, location.origin);
+}
+window.addEventListener('message', e => {
+  if (e.origin !== location.origin) return;
+  const m = e.data || {};
+  if (m.type === 'contagio-ready') sendPreview();
+  if (m.type === 'contagio-rendered') {
+    overflow = new Set((m.overflow || []).map(x => x.split(':')[0]));
+    renderNav(); updateFitWarn();
+    const n = overflow.size;
+    $('#pv-note').textContent = n ? `· ${n} text${n > 1 ? 's' : ''} cut off` : '';
+    $('#pv-note').style.color = n ? 'var(--warn)' : '';
+  }
+});
+document.querySelectorAll('[data-zoom]').forEach(b => b.onclick = () => {
+  zoom = b.dataset.zoom;
+  document.querySelectorAll('[data-zoom]').forEach(x => x.setAttribute('aria-pressed', x === b));
+  sendPreview();
+});
+
+/* ============================================================================
+   Rendering
+   ============================================================================ */
+function renderAll() { renderNav(); renderProgress(); renderSlide(); if (view === 'board') renderBoard(); schedulePreview(); }
+
+function renderProgress() {
+  const ts = Object.values(DATA.topics);
+  const worded = ts.filter(t => filled(t.new.title) || filled(t.new.desc)).length;
+  const final = ts.filter(t => t.status === 'final').length;
+  $('#progress').innerHTML = `<b>${worded}</b>/${ts.length} worded · <b>${final}</b> final`;
+}
+
+function renderNav() {
+  const nav = $('#nav');
+  nav.innerHTML = DATA.stages.map(s => {
+    const sid = 'S' + s.stage;
+    const head = `<button class="stage-btn ${cur === sid ? 'active' : ''}" data-go="${sid}">
+        <span class="sw" style="background:var(--s${s.stage})"></span>
+        <span class="ttl">${s.stage}. ${esc(pick(s.new.label, s.current.label))}</span>
+        <span class="dot ${esc(s.status || '')}"></span>${overflow.has(sid) ? '<span class="warn-ic" title="Cut off">!</span>' : ''}
+      </button>`;
+    const items = s.topics.map(tid => {
+      const t = DATA.topics[tid];
+      return `<button class="${cur === tid ? 'active' : ''} ${t.show ? '' : 'hidden'}" data-go="${tid}" title="${esc(pick(t.new.title, t.current.title))}">
+          <span class="tid">${tid}</span>
+          <span class="ttl">${esc(pick(t.new.title, t.current.title))}${t.show ? '' : ' (hidden)'}</span>
+          ${overflow.has(tid) ? '<span class="warn-ic" title="Text cut off on the page">!</span>' : ''}
+          <span class="dot ${esc(t.status || '')}"></span>
+        </button>`;
+    }).join('');
+    return `<div class="group">${head}${items}<button class="add-mini" data-add="${s.stage}">+ Add topic</button></div>`;
+  }).join('');
+  nav.querySelectorAll('[data-go]').forEach(b => b.onclick = () => go(b.dataset.go));
+  nav.querySelectorAll('[data-add]').forEach(b => b.onclick = () => addTopic(+b.dataset.add));
+  const act = nav.querySelector('.active');
+  if (act) act.scrollIntoView({ block: 'nearest' });
+}
+
+function statusSeg(value) {
+  return `<div class="seg" role="group" aria-label="Status">${STATUS.map(([v, l]) =>
+    `<button data-v="${v}" aria-pressed="${(value || '') === v}">${l}</button>`).join('')}</div>`;
+}
+
+function refCard(title, refId, t, d, emptyText, copyKey) {
+  const empty = !t && !d;
+  return `<div class="ref ${empty ? 'empty' : ''}">
+      <h3><span>${title}</span><span>${esc(refId || '')}</span></h3>
+      ${empty ? `<div class="rd">${emptyText}</div>` : `<div class="rt">${esc(t)}</div><div class="rd">${esc(d)}</div>`}
+      ${empty ? '' : `<button data-copy="${copyKey}">Use this as starting point</button>`}
+    </div>`;
+}
+
+function renderSlide() {
+  const el = $('#slide');
+  const list = order();
+  const idx = list.indexOf(cur);
+  const navBar = `<div class="slide-nav">
+      <button id="prev" ${idx <= 0 ? 'disabled' : ''}>&larr; Previous</button>
+      <button id="next" ${idx >= list.length - 1 ? 'disabled' : ''}>Next &rarr;</button>
+      <span class="pos">${idx + 1} / ${list.length}</span>
+      <span class="kbd"><kbd>PgUp</kbd>/<kbd>PgDn</kbd> anywhere, <kbd>&larr;</kbd>/<kbd>&rarr;</kbd> outside text fields</span>
+    </div>`;
+
+  if (cur.startsWith('S')) {
+    const s = stageById(cur);
+    el.innerHTML = `<div class="slide-card">
+        <div class="slide-head">
+          <span class="id-chip" style="background:var(--s${s.stage})">Stage ${s.stage}</span>
+          <span class="stage-chip">Stage title</span>
+          ${statusSeg(s.status)}
+        </div>
+        <div class="refs">
+          ${refCard('Slide 4', '', s.slide4, '', '', 'slide4')}
+          ${refCard('Slide 5', '', s.slide5, '', '', 'slide5')}
+          ${refCard('Now on the page', '', s.current.label, s.current.sublabel, '', 'current')}
+        </div>
+        <div class="row">
+          <div class="field" style="flex:2">
+            <label for="f-a">New stage title <small>shown in capitals, max. 2 lines in the circle</small></label>
+            <input type="text" id="f-a" value="${esc(s.new.label)}" placeholder="${esc(s.current.label)}">
+            <div class="fit-warn" id="fit">Too long: the title is cut off in the circle. Shorten it.</div>
+          </div>
+          <div class="field">
+            <label for="f-b">New WP line</label>
+            <input type="text" id="f-b" value="${esc(s.new.sublabel)}" placeholder="${esc(s.current.sublabel || '(none)')}">
+          </div>
+        </div>
+        <div class="field">
+          <label>Topics in this stage <small>drag on the Board to move between stages</small></label>
+          <ul class="stage-topics">${s.topics.map((tid, i) => {
+            const t = DATA.topics[tid];
+            return `<li class="${t.show ? '' : 'hidden'}">
+                <b>${tid}</b><span class="grow" data-go="${tid}">${esc(pick(t.new.title, t.current.title))}</span>
+                <button class="mini" data-up="${i}" ${i === 0 ? 'disabled' : ''} title="Move up">&uarr;</button>
+                <button class="mini" data-dn="${i}" ${i === s.topics.length - 1 ? 'disabled' : ''} title="Move down">&darr;</button>
+              </li>`;
+          }).join('')}</ul>
+          <button class="add-btn" id="add-topic">+ Add a new topic to this stage</button>
+        </div>
+        ${navBar}
+      </div>`;
+    bindSeg(s);
+    $('#f-a').oninput = e => { s.new.label = e.target.value; changed(); };
+    $('#f-b').oninput = e => { s.new.sublabel = e.target.value; changed(); };
+    el.querySelectorAll('[data-copy]').forEach(b => b.onclick = () => {
+      if (b.dataset.copy === 'current') { s.new.label = s.current.label; s.new.sublabel = s.current.sublabel; }
+      else {
+        const m = s[b.dataset.copy].match(/^STAGE\s*\d+:\s*(.*?)\s*(\(.*\))?$/i) || [];
+        s.new.label = (m[1] || s[b.dataset.copy]).toUpperCase(); s.new.sublabel = m[2] || '';
+      }
+      changed({ rerender: true });
+    });
+    el.querySelectorAll('[data-go]').forEach(b => b.onclick = () => go(b.dataset.go));
+    $('#add-topic').onclick = () => addTopic(s.stage);
+    el.querySelectorAll('[data-up],[data-dn]').forEach(b => b.onclick = () => {
+      const i = +(b.dataset.up ?? b.dataset.dn), j = b.dataset.up != null ? i - 1 : i + 1;
+      [s.topics[i], s.topics[j]] = [s.topics[j], s.topics[i]];
+      changed({ rerender: true });
+    });
+  } else {
+    const t = DATA.topics[cur];
+    const s = stageOf(cur);
+    const shown = s.topics.filter(x => DATA.topics[x].show);
+    el.innerHTML = `<div class="slide-card">
+        <div class="slide-head">
+          <span class="id-chip" style="background:var(--s${s.stage})">${cur}</span>
+          <span class="stage-chip">Stage ${s.stage} · ${esc(pick(s.new.label, s.current.label))}
+            · ${t.show ? `card ${shown.indexOf(cur) + 1} of ${shown.length}` : 'hidden'}</span>
+          ${statusSeg(t.status)}
+        </div>
+        <div class="refs">
+          ${refCard('Slide 4', t.slide4 && t.slide4.ref, t.slide4 && t.slide4.title, t.slide4 && t.slide4.desc, 'Not on slide 4', 'slide4')}
+          ${refCard('Slide 5', t.slide5 && t.slide5.ref, t.slide5 && t.slide5.title, t.slide5 && t.slide5.desc, 'Not on slide 5', 'slide5')}
+          ${refCard('Now on the page', '', t.current.title, t.current.desc, 'New topic: not on the page yet', 'current')}
+        </div>
+        <div class="meta-note">Match: <b>${esc(t.match)}</b>${t.note ? ' · ' + esc(t.note) : ''}</div>
+        <div class="field">
+          <label for="f-a">New title <small>${esc((t.new.title || '').length)} characters · max. 3 lines on the card</small></label>
+          <input type="text" id="f-a" value="${esc(t.new.title)}" placeholder="${esc(t.current.title)}">
+        </div>
+        <div class="field">
+          <label for="f-b">New description <small id="dlen">${esc((t.new.desc || '').length)} characters · max. 6 lines on the card</small></label>
+          <textarea id="f-b" placeholder="${esc(t.current.desc)}">${esc(t.new.desc)}</textarea>
+          <div class="placeholder-hint">Empty fields keep the text that is now on the page (shown greyed out).</div>
+          <div class="fit-warn" id="fit">Too long: this card's text is cut off on the page. Shorten the title or description.</div>
+        </div>
+        <div class="row">
+          <div class="field" style="flex:2">
+            <label for="f-url">Link <small>empty = "LINK TODO" badge</small></label>
+            <input type="url" id="f-url" value="${esc(t.url || '')}" placeholder="https://…">
+          </div>
+          <div class="field" style="flex:0 0 150px">
+            <label for="f-icon">Icon</label>
+            <select id="f-icon" style="width:100%">${ICONS.map(i => `<option ${i === (t.icon || 'dot') ? 'selected' : ''}>${i}</option>`).join('')}</select>
+          </div>
+          <div class="field" style="flex:0 0 190px">
+            <label for="f-stage">Stage</label>
+            <select id="f-stage" style="width:100%">${DATA.stages.map(x => `<option value="${x.stage}" ${x === s ? 'selected' : ''}>${x.stage}. ${esc(pick(x.new.label, x.current.label))}</option>`).join('')}</select>
+          </div>
+          <label class="toggle"><input type="checkbox" id="f-show" ${t.show ? 'checked' : ''}> Show on page</label>
+        </div>
+        ${isAdded(t) ? '<div style="margin-top:4px"><button class="del-btn" id="del-topic">Delete this topic</button></div>' : ''}
+        ${navBar}
+      </div>`;
+    bindSeg(t);
+    $('#f-a').oninput = e => { t.new.title = e.target.value; e.target.previousElementSibling.querySelector('small').textContent = `${e.target.value.length} characters · max. 3 lines on the card`; changed(); };
+    $('#f-b').oninput = e => { t.new.desc = e.target.value; $('#dlen').textContent = `${e.target.value.length} characters · max. 6 lines on the card`; changed(); };
+    $('#f-url').oninput = e => { t.url = e.target.value.trim() || null; changed(); };
+    $('#f-icon').onchange = e => { t.icon = e.target.value; changed(); };
+    $('#f-show').onchange = e => { t.show = e.target.checked; changed({ rerender: true }); };
+    $('#f-stage').onchange = e => { moveTopic(cur, +e.target.value, null); changed({ rerender: true }); };
+    if ($('#del-topic')) $('#del-topic').onclick = () => deleteTopic(cur);
+    el.querySelectorAll('[data-copy]').forEach(b => b.onclick = () => {
+      const src = b.dataset.copy === 'current' ? t.current : t[b.dataset.copy];
+      t.new.title = src.title.replace(/\s*\[sic\]/g, ''); t.new.desc = src.desc.replace(/\s*\[sic\]/g, '');
+      changed({ rerender: true });
+      $('#f-b').focus();
+    });
+  }
+  $('#prev').onclick = () => step(-1);
+  $('#next').onclick = () => step(1);
+  updateFitWarn();
+}
+
+function bindSeg(obj) {
+  document.querySelectorAll('#slide .slide-head .seg button').forEach(b => b.onclick = () => {
+    obj.status = b.dataset.v;
+    changed({ rerender: true });
+  });
+}
+
+function updateFitWarn() {
+  const f = $('#fit');
+  if (f) f.classList.toggle('show', overflow.has(cur));
+}
+
+/* Topics added in the editor have no slide 4 / slide 5 source and can be deleted again. */
+const isAdded = t => !t.slide4 && !t.slide5;
+
+function addTopic(stageNum) {
+  // Next free ID in this stage's number range, e.g. T2.5 (IDs are permanent, never reused)
+  const nums = Object.keys(DATA.topics).filter(k => k.startsWith('T' + stageNum + '.')).map(k => +k.split('.')[1]);
+  const id = 'T' + stageNum + '.' + (Math.max(0, ...nums) + 1);
+  DATA.topics[id] = {
+    slide4: null, slide5: null, match: 'New', note: 'Added in the editor.',
+    current: { title: '', desc: '' }, new: { title: '', desc: '' },
+    status: 'draft', show: true, icon: 'dot', url: null,
+  };
+  DATA.stages.find(s => s.stage === stageNum).topics.push(id);
+  cur = id;
+  changed({ rerender: true });
+  go(id);
+  setTimeout(() => $('#f-a') && $('#f-a').focus(), 0);
+}
+
+function deleteTopic(tid) {
+  const t = DATA.topics[tid];
+  if (!isAdded(t)) return;
+  const label = pick(t.new.title, t.current.title) || '(empty)';
+  if (!confirm(`Delete ${tid} "${label}"? This cannot be undone in the editor.`)) return;
+  const s = stageOf(tid);
+  const list = order();
+  const prev = list[Math.max(0, list.indexOf(tid) - 1)];
+  s.topics.splice(s.topics.indexOf(tid), 1);
+  delete DATA.topics[tid];
+  cur = prev === tid ? 'S' + s.stage : prev;
+  changed({ rerender: true });
+  go(cur);
+}
+
+function moveTopic(tid, toStage, index) {
+  const from = stageOf(tid);
+  from.topics.splice(from.topics.indexOf(tid), 1);
+  const to = DATA.stages.find(s => s.stage === toStage);
+  if (index == null || index > to.topics.length) to.topics.push(tid); else to.topics.splice(index, 0, tid);
+}
+
+/* ── Board with drag and drop ── */
+let dragId = null;
+function renderBoard() {
+  const b = $('#board');
+  b.innerHTML = DATA.stages.map(s => `<div class="col" data-stage="${s.stage}">
+      <div class="col-head" style="background:var(--s${s.stage})" data-go="S${s.stage}">
+        <div class="n">STAGE ${s.stage} ${s.status ? '· ' + s.status : ''}</div>
+        <div class="l">${esc(pick(s.new.label, s.current.label))}</div>
+      </div>
+      <div class="col-list">${s.topics.map(tid => {
+        const t = DATA.topics[tid];
+        return `<div class="card ${t.show ? '' : 'hidden'}" draggable="true" data-id="${tid}">
+            <div class="ch"><b>${tid}</b><span class="dot ${esc(t.status || '')}"></span>
+              ${overflow.has(tid) ? '<span class="warn-ic" title="Text cut off">!</span>' : ''}
+              <button class="eye" data-eye="${tid}" title="${t.show ? 'Hide from page' : 'Show on page'}">${t.show ? '&#128065;' : '&#8856;'}</button></div>
+            <div class="ct">${esc(pick(t.new.title, t.current.title))}</div>
+            <div class="cd">${esc(pick(t.new.desc, t.current.desc))}</div>
+          </div>`;
+      }).join('')}<button class="add-btn" data-add="${s.stage}">+ Add topic</button></div>
+    </div>`).join('');
+
+  b.querySelectorAll('[data-go]').forEach(x => x.onclick = () => { setView('slides'); go(x.dataset.go); });
+  b.querySelectorAll('[data-add]').forEach(x => x.onclick = () => { setView('slides'); addTopic(+x.dataset.add); });
+  b.querySelectorAll('.card').forEach(c => {
+    c.onclick = e => { if (e.target.closest('.eye')) return; setView('slides'); go(c.dataset.id); };
+    c.ondragstart = e => { dragId = c.dataset.id; c.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', dragId); };
+    c.ondragend = () => { dragId = null; c.classList.remove('dragging'); clearDropLines(); };
+  });
+  b.querySelectorAll('[data-eye]').forEach(x => x.onclick = () => {
+    const t = DATA.topics[x.dataset.eye]; t.show = !t.show; changed({ rerender: true });
+  });
+  b.querySelectorAll('.col').forEach(col => {
+    const list = col.querySelector('.col-list');
+    col.ondragover = e => {
+      if (!dragId) return;
+      e.preventDefault();
+      const idx = dropIndex(list, e.clientY);
+      clearDropLines();
+      const line = document.createElement('div'); line.className = 'drop-line';
+      const cards = [...list.querySelectorAll('.card')];
+      if (idx < cards.length) list.insertBefore(line, cards[idx]); else list.appendChild(line);
+    };
+    col.ondrop = e => {
+      e.preventDefault();
+      if (!dragId) return;
+      const toStage = +col.dataset.stage;
+      let idx = dropIndex(list, e.clientY);
+      const from = stageOf(dragId);
+      const oldIdx = from.topics.indexOf(dragId);
+      if (from.stage === toStage && oldIdx < idx) idx--;
+      moveTopic(dragId, toStage, idx);
+      dragId = null;
+      changed({ rerender: true });
+    };
+  });
+}
+function dropIndex(list, y) {
+  const cards = [...list.querySelectorAll('.card')];
+  for (let i = 0; i < cards.length; i++) {
+    const r = cards[i].getBoundingClientRect();
+    if (y < r.top + r.height / 2) return i;
+  }
+  return cards.length;
+}
+function clearDropLines() { document.querySelectorAll('.drop-line').forEach(x => x.remove()); }
+
+/* ============================================================================
+   Navigation
+   ============================================================================ */
+function go(id) {
+  cur = id;
+  history.replaceState(null, '', '#' + encodeURIComponent(id));
+  renderNav(); renderSlide(); sendPreview();
+}
+function step(d) {
+  const list = order(); const i = list.indexOf(cur) + d;
+  if (i >= 0 && i < list.length) go(list[i]);
+}
+function setView(v) {
+  view = v;
+  $('#main').classList.toggle('board-mode', v === 'board');
+  $('#tab-slides').setAttribute('aria-pressed', v === 'slides');
+  $('#tab-board').setAttribute('aria-pressed', v === 'board');
+  if (v === 'board') renderBoard(); else { renderNav(); renderSlide(); }
+  sendPreview();
+}
+$('#tab-slides').onclick = () => setView('slides');
+$('#tab-board').onclick = () => setView('board');
+
+document.addEventListener('keydown', e => {
+  if (view !== 'slides') return;
+  const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName);
+  if (e.key === 'PageDown' || (!typing && (e.key === 'ArrowRight' || e.key === 'ArrowDown'))) { e.preventDefault(); step(1); }
+  else if (e.key === 'PageUp' || (!typing && (e.key === 'ArrowLeft' || e.key === 'ArrowUp'))) { e.preventDefault(); step(-1); }
+  else if (e.key === 'Escape' && typing) document.activeElement.blur();
+});
+
+load();
+</script>
+</body>
+</html>

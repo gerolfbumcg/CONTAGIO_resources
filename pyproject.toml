@@ -1,0 +1,7 @@
+[project]
+name = "contagio-resources"
+version = "0.1.0"
+description = "CONTAGIO roadmap pages and the local wording editor (python3 main.py)"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = []

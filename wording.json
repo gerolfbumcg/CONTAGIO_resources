@@ -1,0 +1,609 @@
+{
+  "_about": "Content for roadmap_verona.html. Edit with the wording editor (python3 wording_server.py), not by hand. Shown text = 'new' if filled in, otherwise 'current'. Topic IDs (T<stage>.<n>) are permanent; a stage's 'topics' list sets which topics it shows and in which order.",
+  "title": "CONTAGIO: A 5-Stage Roadmap for Rapid Epidemic Response",
+  "subtitle": "A modular workflow to transition research groups from ‘inter-epidemic’ quiet periods to active, coordinated outbreak response units, bridging the gap for immediate data and sample availability.",
+  "stages": [
+    {
+      "stage": 1,
+      "slide4": "STAGE 1: Cohort Preparedness (WP1 & WP2)",
+      "slide5": "STAGE 1: COHORT PREPAREDNESS (WP1 & WP2)",
+      "current": {
+        "label": "COHORT PREPAREDNESS",
+        "sublabel": "(WP1 & WP2)"
+      },
+      "new": {
+        "label": "",
+        "sublabel": ""
+      },
+      "status": "",
+      "topics": [
+        "T1.1",
+        "T1.2",
+        "T1.3",
+        "T1.4"
+      ]
+    },
+    {
+      "stage": 2,
+      "slide4": "STAGE 2: Navigating Ethics & Governance (WP3 & WP4)",
+      "slide5": "STAGE 3: ETHICS & GOVERNANCE (WP3)",
+      "current": {
+        "label": "NAVIGATING ETHICS & GOVERNANCE",
+        "sublabel": "(WP3 & WP4)"
+      },
+      "new": {
+        "label": "",
+        "sublabel": ""
+      },
+      "status": "",
+      "topics": [
+        "T2.1",
+        "T2.2",
+        "T2.3",
+        "T2.4"
+      ]
+    },
+    {
+      "stage": 3,
+      "slide4": "STAGE 3: Design Data & Sample Collection Tools (WP2 & WP4)",
+      "slide5": "STAGE 2: RAPID DATA & SAMPLE COLLECTION (WP2 & WP4)",
+      "current": {
+        "label": "DESIGN DATA & SAMPLE COLLECTION TOOLS",
+        "sublabel": "(WP2 & WP4)"
+      },
+      "new": {
+        "label": "",
+        "sublabel": ""
+      },
+      "status": "",
+      "topics": [
+        "T3.1",
+        "T3.2",
+        "T3.4",
+        "T3.5",
+        "T3.3"
+      ]
+    },
+    {
+      "stage": 4,
+      "slide4": "STAGE 4: Data & Sample Management & Sharing (WP3, WP4 & WP2)",
+      "slide5": "STAGE 4: DATA & SAMPLE MANAGEMENT AND SHARING (WP2-3-4)",
+      "current": {
+        "label": "DATA & SAMPLE MANAGEMENT & SHARING",
+        "sublabel": "(WP3–WP4)"
+      },
+      "new": {
+        "label": "",
+        "sublabel": ""
+      },
+      "status": "",
+      "topics": [
+        "T4.1",
+        "T4.2",
+        "T4.3",
+        "T4.4"
+      ]
+    },
+    {
+      "stage": 5,
+      "slide4": "STAGE 5: Integration & Analysis",
+      "slide5": "STAGE 5: INTEGRATION & ANALYSIS",
+      "current": {
+        "label": "INTEGRATION & ANALYSIS",
+        "sublabel": ""
+      },
+      "new": {
+        "label": "",
+        "sublabel": ""
+      },
+      "status": "",
+      "topics": [
+        "T5.1",
+        "T5.2",
+        "T5.3"
+      ]
+    }
+  ],
+  "topics": {
+    "T1.1": {
+      "slide4": {
+        "ref": "S4-1.1",
+        "title": "Build Consortium Platform",
+        "desc": "Connects research networks with capabilities for outbreak response."
+      },
+      "slide5": {
+        "ref": "S5-1.1",
+        "title": "BUILD YOUR CONSORTIUM",
+        "desc": "Establish Global Research Connections via Cohort Preparedness Platform to connect capabilities."
+      },
+      "match": "Similar",
+      "note": "",
+      "current": {
+        "title": "BUILD YOUR CONSORTIUM",
+        "desc": "Establish Global Research Connections via Cohort Preparedness Platform to connect capabilities."
+      },
+      "new": {
+        "title": "",
+        "desc": ""
+      },
+      "status": "",
+      "show": true,
+      "icon": "network",
+      "url": "https://contagio.shinyapps.io/StarterDashboard/"
+    },
+    "T1.2": {
+      "slide4": {
+        "ref": "S4-1.2",
+        "title": "Existing Data Discovery",
+        "desc": "Accesses EMBL Pathogens Portal for existing data and samples."
+      },
+      "slide5": {
+        "ref": "S5-1.2",
+        "title": "DATA DISCOVERY",
+        "desc": "Access the EMBL Pathogens Portal to leverage existing relevant data and samples."
+      },
+      "match": "Similar",
+      "note": "",
+      "current": {
+        "title": "DATA DISCOVERY",
+        "desc": "Access the EMBL Pathogens Portal to leverage existing relevant data and samples."
+      },
+      "new": {
+        "title": "",
+        "desc": ""
+      },
+      "status": "",
+      "show": true,
+      "icon": "database",
+      "url": "https://www.pathogensportal.org/"
+    },
+    "T1.3": {
+      "slide4": {
+        "ref": "S4-1.3",
+        "title": "Standardised Population Protocols",
+        "desc": "Deploys 5x5 protocols across diverse population groups."
+      },
+      "slide5": {
+        "ref": "S5-1.4",
+        "title": "Standardised Population Protocols",
+        "desc": "Deploys 5x5 protocols across diverse population groups."
+      },
+      "match": "Same",
+      "note": "Pasted box on slide 5.",
+      "current": {
+        "title": "STANDARDISED POPULATION PROTOCOLS",
+        "desc": "Deploys 5x5 protocols across diverse population groups."
+      },
+      "new": {
+        "title": "",
+        "desc": ""
+      },
+      "status": "",
+      "show": false,
+      "icon": "dot",
+      "url": null
+    },
+    "T1.4": {
+      "slide4": {
+        "ref": "S4-1.4",
+        "title": "Public Health Integration",
+        "desc": "Aligns regional priorities with public health authorities."
+      },
+      "slide5": {
+        "ref": "S5-1.3",
+        "title": "PUBLIC HEALTH ALIGNMENT",
+        "desc": "Integrate with Regional Authorities using the ‘Integration’ tool to define priorities and coordination."
+      },
+      "match": "Similar",
+      "note": "Slide 5 names the 'Integration' tool.",
+      "current": {
+        "title": "PUBLIC HEALTH ALIGNMENT",
+        "desc": "Integrate with Regional Authorities using the ‘Integration’ tool to define priorities and coordination."
+      },
+      "new": {
+        "title": "",
+        "desc": ""
+      },
+      "status": "",
+      "show": true,
+      "icon": "people",
+      "url": null
+    },
+    "T2.1": {
+      "slide4": {
+        "ref": "S4-2.1",
+        "title": "Broad Consent Guidelines",
+        "desc": "Provides guidelines and templates for broad informed consent."
+      },
+      "slide5": {
+        "ref": "S5-3.1",
+        "title": "ACCELERATED CONSENT PROCEDURES",
+        "desc": "Implement standardized Broad Consent Guidelines and templates."
+      },
+      "match": "Similar",
+      "note": "",
+      "current": {
+        "title": "ACCELERATED CONSENT PROCEDURES",
+        "desc": "Implement standardized Broad Consent Guidelines and templates."
+      },
+      "new": {
+        "title": "",
+        "desc": ""
+      },
+      "status": "",
+      "show": true,
+      "icon": "dot",
+      "url": null
+    },
+    "T2.2": {
+      "slide4": {
+        "ref": "S4-2.2",
+        "title": "Ethics Application Guidelines",
+        "desc": "Establishes framework to streamline ethics committee applications."
+      },
+      "slide5": {
+        "ref": "S5-3.2",
+        "title": "STREAMLINED ETHICAL APPROVAL",
+        "desc": "Use established guidelines and templates for Ethics Committee Applications during emergencies."
+      },
+      "match": "Similar",
+      "note": "",
+      "current": {
+        "title": "STREAMLINED ETHICAL APPROVAL",
+        "desc": "Use established guidelines and templates for Ethics Committee Applications during emergencies."
+      },
+      "new": {
+        "title": "",
+        "desc": ""
+      },
+      "status": "",
+      "show": true,
+      "icon": "dot",
+      "url": null
+    },
+    "T2.3": {
+      "slide4": {
+        "ref": "S4-2.3",
+        "title": "Standardised Approval Templates",
+        "desc": "Bypasses longthy [sic] legal drofting [sic] to accelerate approvals."
+      },
+      "slide5": null,
+      "match": "—",
+      "note": "",
+      "current": {
+        "title": "STANDARDISED APPROVAL TEMPLATES",
+        "desc": "Bypasses lengthy legal drafting to accelerate approvals."
+      },
+      "new": {
+        "title": "",
+        "desc": ""
+      },
+      "status": "",
+      "show": false,
+      "icon": "dot",
+      "url": null
+    },
+    "T2.4": {
+      "slide4": {
+        "ref": "S4-2.4",
+        "title": "IRB Baseline Templates",
+        "desc": "Simplifies applications for healthy baseline sample collection."
+      },
+      "slide5": null,
+      "match": "—",
+      "note": "",
+      "current": {
+        "title": "IRB BASELINE TEMPLATES",
+        "desc": "Simplifies applications for healthy baseline sample collection."
+      },
+      "new": {
+        "title": "",
+        "desc": ""
+      },
+      "status": "",
+      "show": false,
+      "icon": "dot",
+      "url": null
+    },
+    "T3.1": {
+      "slide4": {
+        "ref": "S4-3.1",
+        "title": "Pre-Built eCRF Extensions",
+        "desc": "Deploys ISARIC-partnered eCRF extensions and cohort-specific modules."
+      },
+      "slide5": {
+        "ref": "S5-2.1",
+        "title": "IMMEDIATE PATIENT DATA COLLECTION",
+        "desc": "Access Pre-built eCRF Extensions developed with ISARIC for harmonized data."
+      },
+      "match": "Similar",
+      "note": "",
+      "current": {
+        "title": "IMMEDIATE PATIENT DATA COLLECTION",
+        "desc": "Access Pre-built eCRF Extensions developed with ISARIC for harmonized data."
+      },
+      "new": {
+        "title": "",
+        "desc": ""
+      },
+      "status": "",
+      "show": true,
+      "icon": "clipboard",
+      "url": "https://bridge.isaric.org/main"
+    },
+    "T3.2": {
+      "slide4": {
+        "ref": "S4-3.2",
+        "title": "Harmonised Data Dictionary",
+        "desc": "Standardises clinical data fields across research sites."
+      },
+      "slide5": null,
+      "match": "Partial",
+      "note": "Only 'harmonized data' in S5-2.1.",
+      "current": {
+        "title": "HARMONISED DATA DICTIONARY",
+        "desc": "Standardises clinical data fields across research sites."
+      },
+      "new": {
+        "title": "",
+        "desc": ""
+      },
+      "status": "",
+      "show": false,
+      "icon": "dot",
+      "url": null
+    },
+    "T3.3": {
+      "slide4": {
+        "ref": "S4-3.3",
+        "title": "LINK Tool Integration",
+        "desc": "Utilises Language Integration Networking Kit for multi-stle [sic] coordination."
+      },
+      "slide5": {
+        "ref": "S5-3.3",
+        "title": "LINK Tool Integration",
+        "desc": "Utilises Language Integration Networking Kit for multi-stle [sic] coordination."
+      },
+      "match": "Same",
+      "note": "Pasted box, placed in the Ethics block on slide 5.",
+      "current": {
+        "title": "Language Integration Network Kit (LINK)",
+        "desc": "Validate and edit automatic machine translations of e-CRFs (es, pt & fr)."
+      },
+      "new": {
+        "title": "",
+        "desc": ""
+      },
+      "status": "",
+      "show": true,
+      "icon": "link",
+      "url": "https://link-mgea.vercel.app/"
+    },
+    "T3.4": {
+      "slide4": {
+        "ref": "S4-3.4",
+        "title": "Standardised Sample Templates",
+        "desc": "Provides protocols for blood and baseline sample storage."
+      },
+      "slide5": {
+        "ref": "S5-2.2",
+        "title": "UNIFORM SAMPLE COLLECTION TEMPLATES",
+        "desc": "Utilize pre-built templates for Standardized Specimen Storage across sites."
+      },
+      "match": "Similar",
+      "note": "",
+      "current": {
+        "title": "UNIFORM SAMPLE COLLECTION TEMPLATES",
+        "desc": "Utilize pre-built templates for Standardized Specimen Storage across sites."
+      },
+      "new": {
+        "title": "",
+        "desc": ""
+      },
+      "status": "",
+      "show": true,
+      "icon": "vial",
+      "url": null
+    },
+    "T3.5": {
+      "slide4": {
+        "ref": "S4-3.5",
+        "title": "Legal Compliance Templates",
+        "desc": "Assists sites with local and national regulatory compliance."
+      },
+      "slide5": {
+        "ref": "S5-2.3",
+        "title": "ETHICAL AND LEGAL FRAMEWORKS",
+        "desc": "Access Regulatory Compliance resources and templates for local legal requirements."
+      },
+      "match": "Similar",
+      "note": "Slide 5 drops 'national'.",
+      "current": {
+        "title": "ETHICAL AND LEGAL FRAMEWORKS",
+        "desc": "Access Regulatory Compliance resources and templates for local legal requirements."
+      },
+      "new": {
+        "title": "",
+        "desc": ""
+      },
+      "status": "",
+      "show": true,
+      "icon": "scales",
+      "url": null
+    },
+    "T4.1": {
+      "slide4": {
+        "ref": "S4-4.1",
+        "title": "DAC Request Roadmap",
+        "desc": "Guides Data Access Committee request reviews and approvals."
+      },
+      "slide5": {
+        "ref": "S5-4.1",
+        "title": "TRANSPARENT DATA REQUEST REVIEWS",
+        "desc": "Follow Data Access Committee (DAC) Roadmap and use DTA templates."
+      },
+      "match": "Similar",
+      "note": "",
+      "current": {
+        "title": "TRANSPARENT DATA REQUEST REVIEWS",
+        "desc": "Follow Data Access Committee (DAC) Roadmap and use DTA templates."
+      },
+      "new": {
+        "title": "",
+        "desc": ""
+      },
+      "status": "",
+      "show": true,
+      "icon": "cloud",
+      "url": null
+    },
+    "T4.2": {
+      "slide4": {
+        "ref": "S4-4.2",
+        "title": "MTA/MDTA Guidelines",
+        "desc": "Provides templates for material and data transfer agreements."
+      },
+      "slide5": null,
+      "match": "Partial",
+      "note": "Only 'DTA templates' in S5-4.1.",
+      "current": {
+        "title": "MTA/MDTA GUIDELINES",
+        "desc": "Provides templates for material and data transfer agreements."
+      },
+      "new": {
+        "title": "",
+        "desc": ""
+      },
+      "status": "",
+      "show": false,
+      "icon": "dot",
+      "url": null
+    },
+    "T4.3": {
+      "slide4": {
+        "ref": "S4-4.3",
+        "title": "Virtual Biorepository Cataloguing",
+        "desc": "Cataloge [sic] biological specimens in the Virtual Biorepository System."
+      },
+      "slide5": {
+        "ref": "S5-4.2",
+        "title": "GLOBAL SPECIMEN CATALOGING",
+        "desc": "Use the Virtual Biorepository System (VBS) for global governance framework cataloging."
+      },
+      "match": "Similar",
+      "note": "",
+      "current": {
+        "title": "GLOBAL SPECIMEN CATALOGING",
+        "desc": "Use the Virtual Biorepository System (VBS) for global governance framework cataloging."
+      },
+      "new": {
+        "title": "",
+        "desc": ""
+      },
+      "status": "",
+      "show": true,
+      "icon": "brain",
+      "url": null
+    },
+    "T4.4": {
+      "slide4": {
+        "ref": "S4-4.4",
+        "title": "10x10 Sharing Project",
+        "desc": "Implements sample access policies, protocols, and ICF templates."
+      },
+      "slide5": {
+        "ref": "S5-4.3",
+        "title": "FACILITATED SAMPLE SHARING POLICIES",
+        "desc": "Apply 10x10 Sharing Project policies for flow of physical materials."
+      },
+      "match": "Similar",
+      "note": "Slide 5 drops protocols and ICF templates.",
+      "current": {
+        "title": "FACILITATED SAMPLE SHARING POLICIES",
+        "desc": "Apply 10x10 Sharing Project policies for flow of physical materials."
+      },
+      "new": {
+        "title": "",
+        "desc": ""
+      },
+      "status": "",
+      "show": true,
+      "icon": "share",
+      "url": null
+    },
+    "T5.1": {
+      "slide4": {
+        "ref": "S4-5.1",
+        "title": "Multimodal Data Pipeline",
+        "desc": "Funnels data using Pathogens Portal Interoperability standards."
+      },
+      "slide5": {
+        "ref": "S5-5.1",
+        "title": "PATHOGENS PORTAL INTEGRATION",
+        "desc": "Flow multimodal data through Interoperable Data Pipeline standards for immediate use, using established interoperability standards."
+      },
+      "match": "Similar",
+      "note": "",
+      "current": {
+        "title": "PATHOGENS PORTAL INTEGRATION",
+        "desc": "Flow multimodal data through Interoperable Data Pipeline standards for immediate use, using established interoperability standards."
+      },
+      "new": {
+        "title": "",
+        "desc": ""
+      },
+      "status": "",
+      "show": true,
+      "icon": "dot",
+      "url": null
+    },
+    "T5.2": {
+      "slide4": {
+        "ref": "S4-5.2",
+        "title": "Governance Framework Activation",
+        "desc": "Activates operational flow for data and physical samples."
+      },
+      "slide5": null,
+      "match": "—",
+      "note": "",
+      "current": {
+        "title": "GOVERNANCE FRAMEWORK ACTIVATION",
+        "desc": "Activates operational flow for data and physical samples."
+      },
+      "new": {
+        "title": "",
+        "desc": ""
+      },
+      "status": "",
+      "show": false,
+      "icon": "dot",
+      "url": null
+    },
+    "T5.3": {
+      "slide4": {
+        "ref": "S4-5.3",
+        "title": "Measurement Error Guidance",
+        "desc": "Ensures high-quality research data during emerging infectious outbreaks."
+      },
+      "slide5": {
+        "ref": "S5-5.2",
+        "title": "HIGH-QUALITY RESEARCH STANDARDS",
+        "desc": "Address measurement errors using EID Measurement Guidance to ensure data integrity."
+      },
+      "match": "Similar",
+      "note": "",
+      "current": {
+        "title": "HIGH-QUALITY RESEARCH STANDARDS",
+        "desc": "Address measurement errors using EID Measurement Guidance to ensure data integrity."
+      },
+      "new": {
+        "title": "",
+        "desc": ""
+      },
+      "status": "",
+      "show": true,
+      "icon": "dot",
+      "url": null
+    }
+  }
+}
