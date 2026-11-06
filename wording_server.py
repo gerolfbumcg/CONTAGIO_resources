@@ -3,6 +3,7 @@
 
     python3 wording_server.py            # opens http://127.0.0.1:8765/editor.html
     python3 wording_server.py --port 9000 --no-browser
+    python3 wording_server.py --export-static   # writes roadmap_static.html
 
 - Serves this folder (editor.html, roadmap_verona.html, wording.json, ...).
 - PUT /api/wording saves wording.json and regenerates the comparison table
@@ -23,6 +24,8 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 WORDING = os.path.join(ROOT, "wording.json")
 CLAUDE_MD = os.path.join(ROOT, "CLAUDE.md")
 START, END = "<!-- wording-table:start -->", "<!-- wording-table:end -->"
+ROADMAP = os.path.join(ROOT, "roadmap_verona.html")
+STATIC_MARKER = "<!-- static-export: embedded wording data -->"
 
 
 # ── Validation ──────────────────────────────────────────────────────────────
@@ -138,6 +141,21 @@ def _atomic_write(path, text):
     os.replace(tmp, path)
 
 
+# ── Static export ───────────────────────────────────────────────────────────
+
+def build_static(data):
+    """roadmap_verona.html with the wording embedded, so it works as a standalone file."""
+    with open(ROADMAP, encoding="utf-8") as f:
+        html = f.read()
+    if STATIC_MARKER not in html:
+        raise ValueError("marker not found in roadmap_verona.html")
+    payload = json.dumps(data, ensure_ascii=False).replace("</", "<\\/")
+    block = ('<!-- Static export of roadmap_verona.html, generated %s. Texts are embedded below. -->\n'
+             '<script type="application/json" id="wording-data">%s</script>'
+             % (datetime.now().strftime("%Y-%m-%d %H:%M"), payload))
+    return html.replace(STATIC_MARKER, block, 1)
+
+
 # ── HTTP ────────────────────────────────────────────────────────────────────
 
 class Handler(SimpleHTTPRequestHandler):
@@ -199,7 +217,19 @@ def main():
     ap.add_argument("--port", type=int, default=8765)
     ap.add_argument("--no-browser", action="store_true")
     ap.add_argument("--export-md", action="store_true", help="only regenerate the CLAUDE.md table and exit")
+    ap.add_argument("--export-static", nargs="?", const="roadmap_static.html", metavar="FILE",
+                    help="write a standalone copy of the roadmap with the wording embedded "
+                         "(default: roadmap_static.html) and exit")
     args = ap.parse_args()
+
+    if args.export_static:
+        with open(WORDING, encoding="utf-8") as f:
+            data = json.load(f)
+        validate(data)
+        out = os.path.join(ROOT, args.export_static) if not os.path.isabs(args.export_static) else args.export_static
+        _atomic_write(out, build_static(data))
+        print("Wrote %s" % out)
+        return
 
     if args.export_md:
         with open(WORDING, encoding="utf-8") as f:

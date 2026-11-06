@@ -40,6 +40,24 @@ Stop the editor with Ctrl+C.
 Options: `python3 main.py --port 9000`, `--no-browser`, or `--export-md` to only regenerate the
 table in `CLAUDE.md`.
 
+## Standalone copy (static HTML)
+
+`roadmap_verona.html` loads its texts from `wording.json`, so a browser "Save Page As" copy
+does not work on its own. To get a single file that opens anywhere (e-mail, USB stick,
+SharePoint) without a server, export it:
+
+- in the editor: **Export static HTML** (top right) downloads `roadmap_static.html` with the
+  current wording built in (also works in the read-only editor on the live site);
+- or from the command line:
+
+```bash
+python3 main.py --export-static
+```
+
+This writes `roadmap_static.html` in this folder (or pass another file name). Without internet
+the page falls back to system fonts; everything else works offline. To get a PDF, open the page
+and use Print → Save as PDF.
+
 ## Publishing
 
 The site is built by GitHub Actions (`.github/workflows/jekyll-gh-pages.yml`) on every push to

@@ -58,6 +58,7 @@ Source images: `2026.11.05_CONTAGIO tools for global preparedness session_slide_
   - Every change auto-saves to `wording.json` and regenerates the table below.
 - **When the user gives wording in chat instead** (e.g. "T2.3: …"): Claude edits `wording.json` (`topics.T2.3.new.title`/`new.desc`, or `stages[n].new.label`/`new.sublabel`), runs `python3 wording_server.py --export-md` to regenerate the table, checks the page via the local server, and asks before committing and pushing.
 - **Publishing:** commit `wording.json` (and CLAUDE.md) and push to `main`; the live site picks it up in about 40 s.
+- **Standalone copy:** "Export static HTML" in the editor, or `python3 main.py --export-static`, writes `roadmap_static.html` with the wording embedded (`<script id="wording-data">`, inserted at the `static-export` marker in `roadmap_verona.html`). It works without a server; a plain "Save Page As" copy does not. The export is not committed by default.
 - `main.py` only starts the editor (`python3 main.py` = `python3 wording_server.py`). It used to hold an unrelated Posit Connect test with a hard-coded API key; that code was removed on 2026-11-06 and was never committed. Never put credentials in this repo.
 
 ### Numbering scheme

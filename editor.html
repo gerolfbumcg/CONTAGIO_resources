@@ -204,6 +204,7 @@
   <div class="spacer"></div>
   <div class="progress" id="progress"></div>
   <div class="save" id="save">Loading…</div>
+  <button class="btn-light" id="export-static" title="Download a standalone copy of the roadmap with the current wording built in">Export static HTML</button>
   <button class="btn-light" id="download" title="Download wording.json">Download JSON</button>
 </header>
 <div class="banner" id="banner"></div>
@@ -315,6 +316,25 @@ $('#download').onclick = () => {
   const blob = new Blob([JSON.stringify(DATA, null, 2) + '\n'], { type: 'application/json' });
   const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: 'wording.json' });
   a.click(); URL.revokeObjectURL(a.href);
+};
+
+/* Static export: roadmap_verona.html with the current wording embedded (works without a server). */
+$('#export-static').onclick = async () => {
+  try {
+    const r = await fetch('roadmap_verona.html', { cache: 'no-store' });
+    const html = await r.text();
+    const marker = '<!-- static-export: embedded wording data -->';
+    if (!html.includes(marker)) throw new Error('marker missing in roadmap_verona.html');
+    const stamp = new Date().toLocaleString('sv-SE').slice(0, 16);
+    const block = `<!-- Static export of roadmap_verona.html, generated ${stamp}. Texts are embedded below. -->\n` +
+      `<script type="application/json" id="wording-data">${JSON.stringify(DATA).replace(/<\//g, '<\\/')}</` + `script>`;
+    const out = html.replace(marker, () => block);
+    const blob = new Blob([out], { type: 'text/html' });
+    const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: 'roadmap_static.html' });
+    a.click(); URL.revokeObjectURL(a.href);
+  } catch (e) {
+    alert('Export failed: ' + e.message);
+  }
 };
 
 /* ============================================================================

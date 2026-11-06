@@ -68,8 +68,10 @@
 </div>
 
 <div class="legend">
-  <span class="swatch todo"></span> = link still to be added (set it in the wording editor: <code>python3 wording_server.py</code>)
+  <span class="swatch todo"></span> = link still to be added<span class="editor-hint"> (set it in the wording editor: <code>python3 main.py</code>)</span>
 </div>
+
+<!-- static-export: embedded wording data -->
 
 <script>
 /* ============================================================================
@@ -870,7 +872,14 @@ window.addEventListener('message', e => {
   }
 });
 
-fetch('wording.json', { cache: 'no-store' })
+// A static export (roadmap_static.html) carries its wording inline, so it works without a server.
+const embedded = document.getElementById('wording-data');
+if (embedded) {
+  const hint = document.querySelector('.editor-hint');
+  if (hint) hint.remove();
+  applyWording(JSON.parse(embedded.textContent));
+  renderAndReport();
+} else fetch('wording.json', { cache: 'no-store' })
   .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
   .then(data => { if (!gotLiveData) { applyWording(data); renderAndReport(); } })
   .catch(() => {
