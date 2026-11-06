@@ -67,7 +67,7 @@
 
   /* ── Main layout ── */
   main { display: grid; grid-template-columns: 250px minmax(420px, 1fr) minmax(360px, 0.9fr); min-height: 0; }
-  main.board-mode { grid-template-columns: 1fr; grid-template-rows: minmax(0, 1.15fr) minmax(0, 1fr); }
+  main.board-mode { grid-template-columns: 1fr; grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); }
   main.board-mode nav, main.board-mode #slide { display: none; }
   main:not(.board-mode) #board { display: none; }
 
@@ -169,6 +169,11 @@
   .card:hover { border-color: #b9c9da; }
   .card.hidden { opacity: .55; border: 2px dashed #b9c4d0; box-shadow: none; }
   .card.dragging { opacity: .35; }
+  .card.selected { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(232,163,23,.25); }
+  .col-head.selected { box-shadow: 0 0 0 3px var(--accent); }
+  .card .edit { border: 0; background: none; padding: 0 2px; font-size: 14px; color: var(--muted); }
+  .card .edit:hover, .card .eye:hover { color: var(--navy); }
+  .board-hint { grid-column: 1 / -1; font-size: 12.5px; color: var(--muted); margin: -4px 0 -2px; }
   .card .ch { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; }
   .card .ch b { font-size: 12px; color: var(--muted); }
   .card .ct { font-weight: 800; line-height: 1.25; }
@@ -347,7 +352,8 @@ function sendPreview() {
   const st = cur.startsWith('S') ? stageById(cur) : stageOf(cur);
   w.postMessage({
     type: 'contagio-wording', data: DATA, focus: cur,
-    zoomStage: zoom === 'stage' && view === 'slides' && st ? st.stage : null,
+    zoomStage: zoom === 'stage' && st ? st.stage : null,
+    fit: zoom === 'full',
   }, location.origin);
 }
 window.addEventListener('message', e => {
@@ -609,27 +615,34 @@ function moveTopic(tid, toStage, index) {
 let dragId = null;
 function renderBoard() {
   const b = $('#board');
-  b.innerHTML = DATA.stages.map(s => `<div class="col" data-stage="${s.stage}">
-      <div class="col-head" style="background:var(--s${s.stage})" data-go="S${s.stage}">
+  b.innerHTML = `<div class="board-hint">Click a card or stage to preview it · double-click or &#9998; to edit · drag cards to reorder or move them</div>` +
+    DATA.stages.map(s => `<div class="col" data-stage="${s.stage}">
+      <div class="col-head ${cur === 'S' + s.stage ? 'selected' : ''}" style="background:var(--s${s.stage})" data-go="S${s.stage}">
         <div class="n">STAGE ${s.stage} ${s.status ? '· ' + s.status : ''}</div>
         <div class="l">${esc(pick(s.new.label, s.current.label))}</div>
       </div>
       <div class="col-list">${s.topics.map(tid => {
         const t = DATA.topics[tid];
-        return `<div class="card ${t.show ? '' : 'hidden'}" draggable="true" data-id="${tid}">
+        return `<div class="card ${t.show ? '' : 'hidden'} ${cur === tid ? 'selected' : ''}" draggable="true" data-id="${tid}">
             <div class="ch"><b>${tid}</b><span class="dot ${esc(t.status || '')}"></span>
               ${overflow.has(tid) ? '<span class="warn-ic" title="Text cut off">!</span>' : ''}
-              <button class="eye" data-eye="${tid}" title="${t.show ? 'Hide from page' : 'Show on page'}">${t.show ? '&#128065;' : '&#8856;'}</button></div>
+              <button class="eye" data-eye="${tid}" title="${t.show ? 'Hide from page' : 'Show on page'}">${t.show ? '&#128065;' : '&#8856;'}</button>
+              <button class="edit" data-edit="${tid}" title="Edit wording">&#9998;</button></div>
             <div class="ct">${esc(pick(t.new.title, t.current.title))}</div>
             <div class="cd">${esc(pick(t.new.desc, t.current.desc))}</div>
           </div>`;
       }).join('')}<button class="add-btn" data-add="${s.stage}">+ Add topic</button></div>
     </div>`).join('');
 
-  b.querySelectorAll('[data-go]').forEach(x => x.onclick = () => { setView('slides'); go(x.dataset.go); });
+  b.querySelectorAll('[data-go]').forEach(x => {
+    x.onclick = () => select(x.dataset.go);
+    x.ondblclick = () => { setView('slides'); go(x.dataset.go); };
+  });
+  b.querySelectorAll('[data-edit]').forEach(x => x.onclick = e => { e.stopPropagation(); setView('slides'); go(x.dataset.edit); });
   b.querySelectorAll('[data-add]').forEach(x => x.onclick = () => { setView('slides'); addTopic(+x.dataset.add); });
   b.querySelectorAll('.card').forEach(c => {
-    c.onclick = e => { if (e.target.closest('.eye')) return; setView('slides'); go(c.dataset.id); };
+    c.onclick = e => { if (e.target.closest('.eye, .edit')) return; select(c.dataset.id); };
+    c.ondblclick = e => { if (e.target.closest('.eye, .edit')) return; setView('slides'); go(c.dataset.id); };
     c.ondragstart = e => { dragId = c.dataset.id; c.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', dragId); };
     c.ondragend = () => { dragId = null; c.classList.remove('dragging'); clearDropLines(); };
   });
@@ -679,6 +692,16 @@ function go(id) {
   history.replaceState(null, '', '#' + encodeURIComponent(id));
   renderNav(); renderSlide(); sendPreview();
 }
+/* Board: select a card or stage (preview follows) without leaving the board */
+function select(id) {
+  cur = id;
+  history.replaceState(null, '', '#' + encodeURIComponent(id));
+  document.querySelectorAll('#board .selected').forEach(x => x.classList.remove('selected'));
+  const elx = document.querySelector(`#board [data-id="${id}"], #board .col-head[data-go="${id}"]`);
+  if (elx) elx.classList.add('selected');
+  sendPreview();
+}
+
 function step(d) {
   const list = order(); const i = list.indexOf(cur) + d;
   if (i >= 0 && i < list.length) go(list[i]);

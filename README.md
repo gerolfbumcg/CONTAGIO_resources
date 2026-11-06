@@ -31,8 +31,10 @@ This opens http://127.0.0.1:8765/editor.html:
   reference texts from the slides next to fields for the new wording, plus status
   (To do / Draft / Final), link, icon and "Show on page". Navigate with PgUp/PgDn.
 - **Board view:** drag cards to reorder topics or move them to another stage; show/hide them;
-  add new topics with "+ Add topic".
+  add new topics with "+ Add topic". Click a card to preview it, double-click (or ✎) to edit it.
 - **Live preview:** the roadmap with your changes, including a warning when text is cut off.
+  "This stage" zooms in on the selected stage and scrolls to the selected card;
+  "Whole roadmap" shrinks the full roadmap to fit the pane.
 
 Changes are saved automatically to `wording.json` (and to the comparison table in `CLAUDE.md`).
 Stop the editor with Ctrl+C.

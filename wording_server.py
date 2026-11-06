@@ -240,7 +240,14 @@ def main():
         return
 
     url = "http://127.0.0.1:%d/editor.html" % args.port
-    srv = ThreadingHTTPServer(("127.0.0.1", args.port), Handler)
+    try:
+        srv = ThreadingHTTPServer(("127.0.0.1", args.port), Handler)
+    except OSError:
+        print("Port %d is already in use: the editor is probably already running.\n"
+              "Open %s, or use another port: python3 main.py --port 8766" % (args.port, url))
+        if not args.no_browser:
+            webbrowser.open(url)
+        return
     print("Wording editor: %s   (Ctrl+C to stop)" % url)
     if not args.no_browser:
         webbrowser.open(url)

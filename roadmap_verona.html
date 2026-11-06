@@ -92,6 +92,8 @@ const STAGE_STYLE = {
 let TITLE = '', SUBTITLE = '', STAGES = [];
 let FOCUS = null;            // topic id ('T2.3') or stage id ('S2') highlighted by the editor
 let ZOOM_STAGE = null;       // stage number to zoom the preview on (editor only)
+let FIT = false;             // editor: scale the whole roadmap to fit the preview pane
+let FOCUS_EL = null;         // highlighted element, scrolled into view in the editor preview
 let OVERFLOW = [];           // ids whose text was cut off while rendering
 
 const pick = (n, c) => (typeof n === 'string' && n.trim()) ? n.trim() : (c || '');
@@ -610,6 +612,7 @@ function render() {
   const svg = document.getElementById('diagram');
   svg.replaceChildren();
   OVERFLOW = [];
+  FOCUS_EL = null;
   const { W, headerH, subtitleY, subtitleMaxChars,
           bubbleR, topRowY, bottomRowY, colX,
           cardW, cardH, cardGapY, itemsTopY, itemsBottomY } = LAYOUT;
@@ -704,7 +707,7 @@ function render() {
     // Thick shaded ring with drop shadow
     el('circle', { cx, cy, r: bubbleR, fill: `url(#sg${i})`, filter: 'url(#shRing)' }, svg);
     if (FOCUS === `S${st.number}`) {
-      el('circle', { cx, cy, r: bubbleR + 9, fill: 'none', stroke: '#e8a317',
+      FOCUS_EL = el('circle', { cx, cy, r: bubbleR + 9, fill: 'none', stroke: '#e8a317',
         'stroke-width': 4, 'stroke-dasharray': '10,6' }, svg);
     }
     // Inner-edge shadow + white disc
@@ -791,7 +794,7 @@ function drawItem(svg, item, x, y, w, L, stage) {
   el('rect', { x: x - 6, y: y - 4, width: w + 12, height: h + 8, rx: 8,
     fill: 'transparent', 'class': 'card-hit' }, a);
   if (FOCUS && FOCUS === item.id) {
-    el('rect', { x: x - 12, y: y - 10, width: w + 24, height: h + 20, rx: 12,
+    FOCUS_EL = el('rect', { x: x - 12, y: y - 10, width: w + 24, height: h + 20, rx: 12,
       fill: 'rgba(232,163,23,0.08)', stroke: '#e8a317', 'stroke-width': 3,
       'stroke-dasharray': '8,5' }, a);
   }
@@ -850,6 +853,9 @@ if (inEditor) {
 function renderAndReport() {
   render();
   const svg = document.getElementById('diagram');
+  // Editor "Whole roadmap": shrink to fit the preview pane (no scrolling needed)
+  svg.style.maxHeight = FIT ? '100vh' : '';
+  svg.style.width = FIT ? 'auto' : '';
   const zs = ZOOM_STAGE && STAGES.find(s => s.number === ZOOM_STAGE);
   if (zs && zs._box) {
     const b = zs._box;
@@ -857,6 +863,7 @@ function renderAndReport() {
     svg.setAttribute('width', b.x1 - b.x0);
     svg.setAttribute('height', b.y1 - b.y0);
   }
+  if (inEditor && FOCUS_EL && !FIT) FOCUS_EL.scrollIntoView({ block: 'center', inline: 'center' });
   if (inEditor) window.parent.postMessage({ type: 'contagio-rendered', overflow: OVERFLOW }, location.origin);
 }
 
@@ -867,6 +874,7 @@ window.addEventListener('message', e => {
     gotLiveData = true;
     FOCUS = m.focus || null;
     ZOOM_STAGE = m.zoomStage || null;
+    FIT = !!m.fit;
     applyWording(m.data);
     renderAndReport();
   }
