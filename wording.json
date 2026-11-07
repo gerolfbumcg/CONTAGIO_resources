@@ -175,11 +175,11 @@
         "desc": "Deploys 5x5 protocols across diverse population groups."
       },
       "new": {
-        "title": "",
-        "desc": ""
+        "title": "ACCESS STANDARDISED PROTOCOLS",
+        "desc": "\"Warm Base\" 5x5 protocols"
       },
       "status": "",
-      "show": false,
+      "show": true,
       "icon": "dot",
       "url": null
     },
