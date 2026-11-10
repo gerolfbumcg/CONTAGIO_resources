@@ -38,10 +38,19 @@
   }
 
   /* Link styling inside the SVG */
-  svg a { cursor: pointer; }
-  svg a text.card-title { transition: text-decoration 0.15s ease; }
-  svg a:hover text.card-title { text-decoration: underline; }
-  svg a:hover .card-hit { fill: rgba(26, 58, 92, 0.04); }
+  svg a { cursor: pointer; outline: none; transition: transform 0.15s ease; }
+  svg a .card-hit { transition: fill 0.15s ease, fill-opacity 0.15s ease, stroke-width 0.15s ease, filter 0.15s ease; }
+  svg a:hover, svg a:focus-visible { transform: translateY(-2px); }
+  svg a:hover .card-hit, svg a:focus-visible .card-hit {
+    fill: var(--card-fill); fill-opacity: 0.6; stroke-width: 2.5;
+    filter: drop-shadow(0 3px 5px rgba(26, 58, 92, 0.22));
+  }
+  svg a:focus-visible .card-hit { stroke: #e8a317; stroke-width: 3; }
+  svg a:hover .card-underline, svg a:focus-visible .card-underline { stroke-opacity: 1; stroke-width: 2; }
+  @media (prefers-reduced-motion: reduce) {
+    svg a, svg a .card-hit { transition: none; }
+    svg a:hover, svg a:focus-visible { transform: none; }
+  }
 
   .legend {
     text-align: center;
@@ -59,6 +68,10 @@
     margin: 0 0.3rem 0 0.6rem;
   }
   .legend .swatch.todo { background: var(--todo); }
+  .legend .pill-open {
+    display: inline-block; padding: 1px 7px; border-radius: 7px;
+    background: #1a3a5c; color: #fff; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.04em;
+  }
 </style>
 </head>
 <body>
@@ -68,7 +81,8 @@
 </div>
 
 <div class="legend">
-  <span class="swatch todo"></span> = link still to be added<span class="editor-hint"> (set it in the wording editor: <code>python3 main.py</code>)</span>
+  <span class="pill-open">OPEN &#8599;</span> = opens the resource in a new tab
+  &nbsp;·&nbsp; <span class="swatch todo"></span> = link still to be added<span class="editor-hint"> (set it in the wording editor: <code>python3 main.py</code>)</span>
 </div>
 
 <!-- static-export: embedded wording data -->
@@ -187,9 +201,12 @@ const CARD = {
 };
 
 /* Lay out one card: wrapped lines, height and whether text had to be cut. */
+const LINK_ARROW = '⁠↗';      // word joiner keeps the ↗ on the title's last line
 function layoutItem(item, w) {
   const textW = w - CARD.textDX - 4;
-  const tAll = wrapMeasured(item.title, CARD.titleFont, textW, CARD.titleLS);
+  const linked = !!(item.url && item.url.trim());
+  const title = linked && item.title ? item.title + LINK_ARROW : item.title;
+  const tAll = wrapMeasured(title, CARD.titleFont, linked ? textW - 5 : textW, CARD.titleLS);
   const dAll = wrapMeasured(item.desc, CARD.descFont, textW);
   const titleLines = tAll.slice(0, CARD.titleMax);
   const descLines = dAll.slice(0, CARD.descMax);
@@ -790,9 +807,14 @@ function drawItem(svg, item, x, y, w, L, stage) {
     ? el('a', { href: item.url, target: '_blank', rel: 'noopener noreferrer' }, svg)
     : el('g', { 'class': 'todo' }, svg);
 
-  // Invisible hit area (covers the whole item, fades in on hover for linked items)
-  el('rect', { x: x - 6, y: y - 4, width: w + 12, height: h + 8, rx: 8,
-    fill: 'transparent', 'class': 'card-hit' }, a);
+  // Card background: linked items get a visible outlined card (stronger on hover/focus),
+  // unlinked items keep an invisible hit area.
+  el('rect', hasUrl
+    ? { x: x - 6, y: y - 4, width: w + 12, height: h + 8, rx: 8, 'class': 'card-hit',
+        fill: lighten(stage.color, 150), 'fill-opacity': 0.35, stroke: stage.color, 'stroke-width': 1.5,
+        style: `--card-fill:${lighten(stage.color, 120)}` }
+    : { x: x - 6, y: y - 4, width: w + 12, height: h + 8, rx: 8, fill: 'transparent', 'class': 'card-hit' }, a);
+  if (hasUrl) el('title', {}, a).textContent = `Open: ${item.title || item.url} (new tab)`;
   if (FOCUS && FOCUS === item.id) {
     FOCUS_EL = el('rect', { x: x - 12, y: y - 10, width: w + 24, height: h + 20, rx: 12,
       fill: 'rgba(232,163,23,0.08)', stroke: '#e8a317', 'stroke-width': 3,
@@ -815,21 +837,38 @@ function drawItem(svg, item, x, y, w, L, stage) {
   const badgeX = iconCX - badgeW / 2;
   const badgeY = iconCY + iconSize / 2 + 6;
   el('rect', hasUrl
-    ? { x: badgeX, y: badgeY, width: badgeW, height: 15, rx: 7, fill: lighten(stage.color, 50), opacity: 0.6 }
+    ? { x: badgeX, y: badgeY, width: badgeW, height: 15, rx: 7, fill: stage.dark }
     : { x: badgeX, y: badgeY, width: badgeW, height: 15, rx: 7, fill: 'rgba(199,145,0,0.12)',
         stroke: '#c79100', 'stroke-width': 0.8, 'stroke-dasharray': '3,2' }, badge);
   el('text', { x: badgeX + badgeW / 2, y: badgeY + 10.5,
     'font-family': 'Nunito Sans, sans-serif', 'font-size': 8.5, 'font-weight': 700, 'letter-spacing': 0.6,
-    fill: hasUrl ? stage.dark : '#8a6700', 'text-anchor': 'middle' }, badge)
-    .textContent = hasUrl ? 'OPEN LINK \u2197' : 'LINK TODO';
+    fill: hasUrl ? '#fff' : '#8a6700', 'text-anchor': 'middle' }, badge)
+    .textContent = hasUrl ? 'OPEN \u2197' : 'LINK TODO';
 
-  // Title (bold) and description, wrapped to the measured card width
+  // Title (bold) and description, wrapped to the measured card width.
+  // Linked titles: permanent underline in the stage colour and a \u2197 at the end.
   const textX = x + CARD.textDX;
   let ty = y + 16;
   L.titleLines.forEach(line => {
-    el('text', { x: textX, y: ty, 'font-family': 'Nunito, sans-serif', 'font-size': 16,
+    const t = el('text', { x: textX, y: ty, 'font-family': 'Nunito, sans-serif', 'font-size': 16,
       'font-weight': 800, 'letter-spacing': CARD.titleLS,
-      fill: hasUrl ? stage.dark : '#5a7a9a', 'class': 'card-title' }, a).textContent = line;
+      fill: hasUrl ? stage.dark : '#5a7a9a', 'class': 'card-title' }, a);
+    if (hasUrl && line.endsWith(LINK_ARROW)) {
+      t.appendChild(document.createTextNode(line.slice(0, -LINK_ARROW.length)));
+      el('tspan', { dx: 5, fill: stage.color }, t).textContent = '\u2197';
+    } else {
+      t.textContent = line;
+    }
+    if (hasUrl) {
+      let lw = 0;
+      try { lw = t.getComputedTextLength(); } catch (e) {}
+      if (!lw) {   // not rendered yet (e.g. hidden iframe): fall back to canvas measurement
+        _measureCtx.font = CARD.titleFont;
+        lw = _measureCtx.measureText(line).width + CARD.titleLS * line.length + (line.endsWith(LINK_ARROW) ? 5 : 0);
+      }
+      el('line', { x1: textX, y1: ty + 3, x2: textX + lw, y2: ty + 3,
+        stroke: stage.color, 'stroke-width': 1.5, 'stroke-opacity': 0.7, 'class': 'card-underline' }, a);
+    }
     ty += CARD.titleLH;
   });
   ty += 4;
