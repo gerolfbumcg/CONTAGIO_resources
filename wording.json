@@ -123,7 +123,7 @@
         "desc": "Establish Global Research Connections via Cohort Preparedness Platform to connect capabilities."
       },
       "new": {
-        "title": "",
+        "title": "COHORT PREPAREDNESS PLATFORM",
         "desc": ""
       },
       "status": "",
@@ -555,7 +555,7 @@
       "status": "",
       "show": true,
       "icon": "dot",
-      "url": null
+      "url": "https://www.pathogensportal.org/"
     },
     "T5.2": {
       "slide4": {
